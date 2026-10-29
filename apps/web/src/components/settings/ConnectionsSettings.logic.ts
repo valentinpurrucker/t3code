@@ -24,6 +24,7 @@ import {
   getDesktopUpdateDownloadedVersion,
   resolveDesktopUpdateButtonAction,
 } from "../desktopUpdate.logic";
+import { t, tn, locale } from "~/i18n";
 
 /** Keep terminal:read with terminal:operate to avoid creating unseen shells on every script run. */
 export function togglePairingScopeSelection(
@@ -63,8 +64,8 @@ export function missingTailscaleEndpointDescription(
   state: Pick<DesktopServerExposureState, "mode" | "tailscaleServeEnabled"> | null,
 ): string {
   return state && state.mode !== "network-accessible" && !state.tailscaleServeEnabled
-    ? "Turn on Network access to detect Tailscale."
-    : "Start Tailscale to set up HTTPS access through MagicDNS.";
+    ? t("Turn on Network access to detect Tailscale.")
+    : t("Start Tailscale to set up HTTPS access through MagicDNS.");
 }
 
 export function isWslSettingsRowVisible(input: {
@@ -80,11 +81,11 @@ export function isWslSettingsRowVisible(input: {
  * including retryable failures. Rechecks retain downloaded-update labels; `state` is null outside desktop.
  */
 export function resolveLocalVersionStatusLabel(state: DesktopUpdateState | null): string {
-  if (!state) return "Up to date";
+  if (!state) return t("Up to date");
   if (state.status === "downloading") {
     return state.availableVersion
-      ? `Downloading update ${state.availableVersion}`
-      : "Downloading update";
+      ? t("Downloading update {version}", { version: state.availableVersion })
+      : t("Downloading update");
   }
   const action = resolveDesktopUpdateButtonAction(state);
   if (
@@ -93,14 +94,14 @@ export function resolveLocalVersionStatusLabel(state: DesktopUpdateState | null)
     (state.status === "checking" && state.downloadedVersion !== null)
   ) {
     const version = getDesktopUpdateDownloadedVersion(state);
-    return version ? `Update ${version} downloaded` : "Update downloaded";
+    return version ? t("Update {version} downloaded", { version }) : t("Update downloaded");
   }
   if (action === "download") {
     return state.availableVersion
-      ? `Update ${state.availableVersion} available`
-      : "Update available";
+      ? t("Update {version} available", { version: state.availableVersion })
+      : t("Update available");
   }
-  return "Up to date";
+  return t("Up to date");
 }
 
 export type QrEndpointOption = {
@@ -142,7 +143,7 @@ export async function applyWslEnableSelection(input: {
   return await bridge.setWslBackendEnabled(true);
 }
 
-const accessTimestampFormatter = new Intl.DateTimeFormat(undefined, {
+const accessTimestampFormatter = new Intl.DateTimeFormat(locale, {
   dateStyle: "medium",
   timeStyle: "short",
 });
@@ -162,7 +163,7 @@ export function parseManualDesktopSshTarget(input: {
 }): DesktopSshEnvironmentTarget {
   const rawHost = input.host.trim();
   if (rawHost.length === 0) {
-    throw new Error("SSH host or alias is required.");
+    throw new Error(t("SSH host or alias is required."));
   }
 
   let hostname = rawHost;
@@ -198,11 +199,11 @@ export function parseManualDesktopSshTarget(input: {
   }
 
   if (hostname.length === 0) {
-    throw new Error("SSH host or alias is required.");
+    throw new Error(t("SSH host or alias is required."));
   }
 
   if (port !== null && (!Number.isInteger(port) || port <= 0 || port > 65_535)) {
-    throw new Error("SSH port must be between 1 and 65535.");
+    throw new Error(t("SSH port must be between 1 and 65535."));
   }
 
   return {
@@ -257,16 +258,16 @@ export function parseRemotePairingFields(input: {
   const host = input.host.trim();
   const pairingCode = input.pairingCode.trim();
   if (!host) {
-    throw new Error("Enter a backend host.");
+    throw new Error(t("Enter a backend host."));
   }
   if (!pairingCode) {
-    throw new Error("Enter a pairing code.");
+    throw new Error(t("Enter a pairing code."));
   }
   return { host, pairingCode };
 }
 
 export function formatDesktopSshConnectionError(error: unknown): string {
-  const fallback = "Failed to connect SSH host.";
+  const fallback = t("Failed to connect SSH host.");
   const rawMessage = error instanceof Error ? error.message : fallback;
   const withoutIpcPrefix = rawMessage.replace(
     /^Error invoking remote method 'desktop:ensure-ssh-environment':\s*/u,
@@ -287,10 +288,8 @@ export function summarizeAuthorizedClients(
   links: ReadonlyArray<ServerPairingLinkRecord>,
 ): string {
   const parts = [
-    `${sessions.length} ${sessions.length === 1 ? "client" : "clients"}`,
-    links.length > 0
-      ? `${links.length} ${links.length === 1 ? "pairing link" : "pairing links"}`
-      : null,
+    tn(sessions.length, "{count} client", "{count} clients"),
+    links.length > 0 ? tn(links.length, "{count} pairing link", "{count} pairing links") : null,
   ];
   return parts.filter((part): part is string => part !== null).join(" · ");
 }
@@ -407,16 +406,16 @@ export function isHostedAppPairingUrl(value: string): boolean {
 
 export function endpointShareHint(endpoint: AdvertisedEndpoint, url: string): string {
   if (isHostedAppPairingUrl(url)) {
-    return "Opens the hosted app, no install needed";
+    return t("Opens the hosted app, no install needed");
   }
   switch (endpoint.reachability) {
     case "lan":
-      return "Devices on the same network";
+      return t("Devices on the same network");
     case "private-network":
-      return "Devices on your private network";
+      return t("Devices on your private network");
     case "public":
-      return "Reachable from anywhere";
+      return t("Reachable from anywhere");
     case "loopback":
-      return "Clients on this machine";
+      return t("Clients on this machine");
   }
 }
