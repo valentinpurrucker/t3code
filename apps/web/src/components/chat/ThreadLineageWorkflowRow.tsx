@@ -1,3 +1,4 @@
+import { t, tn } from "~/i18n";
 import type {
   SubagentWorkflowGroup,
   RuntimeSubagent,
@@ -34,6 +35,14 @@ function phaseElapsed(phase: SubagentWorkflowGroup["phases"][number]) {
     completedAt,
   };
 }
+
+const PHASE_STATUS_LABELS = {
+  running: t("running"),
+  failed: t("failed"),
+  stopped: t("stopped"),
+  done: t("done"),
+  "not started": t("not started"),
+} as const;
 
 function phaseStatusLabel(phase: SubagentWorkflowGroup["phases"][number]) {
   if (phase.state === "running") return "running";
@@ -73,7 +82,7 @@ function WorkflowMemberRow({
           render={
             <ThreadDetailsControl
               part="row"
-              aria-label={`Open ${member.title} chat`}
+              aria-label={t("Open {title} chat", { title: member.title })}
               disabled={!canOpen}
               onClick={() => canOpen && onOpen(threadId)}
             />
@@ -151,7 +160,7 @@ export function ThreadLineageWorkflowRow({
                     variant="ghost"
                     part="icon"
                     tone="destructive"
-                    aria-label={`Stop workflow ${label}`}
+                    aria-label={t("Stop workflow {label}", { label })}
                     disabled={stopDisabled}
                     onClick={onStop}
                   />
@@ -163,7 +172,7 @@ export function ThreadLineageWorkflowRow({
                   <SquareIcon aria-hidden className="size-3 fill-current" />
                 )}
               </TooltipTrigger>
-              <TooltipPopup side="left">Stop entire workflow</TooltipPopup>
+              <TooltipPopup side="left">{t("Stop entire workflow")}</TooltipPopup>
             </Tooltip>
           </div>
         ) : null}
@@ -173,7 +182,7 @@ export function ThreadLineageWorkflowRow({
           variant="ghost"
           part="secondary"
           aria-expanded={expanded}
-          aria-label={`${expanded ? "Collapse" : "Expand"} ${label}`}
+          aria-label={expanded ? t("Collapse {label}", { label }) : t("Expand {label}", { label })}
           onClick={() => setExpanded((value) => !value)}
         >
           <ChevronDownIcon
@@ -196,16 +205,26 @@ export function ThreadLineageWorkflowRow({
                   variant="panel"
                   tone={phase.state === "running" ? "emphasized" : "muted"}
                   expanded={open}
-                  aria-label={`${open ? "Collapse" : "Expand"} ${phase.title} phase, ${status}`}
+                  aria-label={
+                    open
+                      ? t("Collapse {title} phase, {status}", {
+                          title: phase.title,
+                          status: PHASE_STATUS_LABELS[status],
+                        })
+                      : t("Expand {title} phase, {status}", {
+                          title: phase.title,
+                          status: PHASE_STATUS_LABELS[status],
+                        })
+                  }
                   onClick={() => setPhaseOpen((phases) => new Map(phases).set(phase.index, !open))}
                   accessory={
                     <>
                       {status === "failed" ? (
-                        <SectionHeaderStatus>Failed</SectionHeaderStatus>
+                        <SectionHeaderStatus>{t("Failed")}</SectionHeaderStatus>
                       ) : null}
                       <span className="shrink-0 text-2xs font-normal tabular-nums">
-                        {phase.settledCount}/{phase.members.length}{" "}
-                        {phase.members.length === 1 ? "agent" : "agents"}
+                        {phase.settledCount}/
+                        {tn(phase.members.length, "{count} agent", "{count} agents")}
                       </span>
                       <span className="shrink-0 text-2xs font-normal tabular-nums empty:hidden">
                         <AgentElapsed agent={phaseElapsed(phase)} />
@@ -247,7 +266,9 @@ export function ThreadLineageWorkflowRow({
             />
           ))}
           {phases.length === 0 && group.unphasedMembers.length === 0 ? (
-            <li className="px-2.5 py-1.5 text-2xs text-muted-foreground/70">No agents yet</li>
+            <li className="px-2.5 py-1.5 text-2xs text-muted-foreground/70">
+              {t("No agents yet")}
+            </li>
           ) : null}
         </ul>
       ) : null}

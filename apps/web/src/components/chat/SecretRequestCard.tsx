@@ -1,3 +1,4 @@
+import { t } from "~/i18n";
 import { pipe } from "effect/Function";
 import {
   SECRET_REQUEST_DEFAULT_PLACEHOLDER,
@@ -137,7 +138,7 @@ function PendingSecretRequestForm(props: {
           />
         </div>
         <Button type="submit" disabled={submitting || secret.trim().length === 0}>
-          Save securely
+          {t("Save securely")}
         </Button>
       </div>
       {error !== null ? (
@@ -160,7 +161,7 @@ function PendingSecretRequestForm(props: {
           disabled={submitting}
           onClick={() => void send({ type: "decline" })}
         >
-          Decline
+          {t("Decline")}
         </Button>
       </div>
     </form>

@@ -1,3 +1,4 @@
+import { t } from "~/i18n";
 import type {
   ProviderInstanceId,
   ServerProvider,
@@ -23,9 +24,9 @@ import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { ThreadDetailsSection } from "./ThreadDetailsSection";
 
 const PACE_LABEL: Record<LimitPace, string> = {
-  ahead: "Ahead of pace",
-  on: "On pace",
-  under: "Under pace",
+  ahead: t("Ahead of pace"),
+  on: t("On pace"),
+  under: t("Under pace"),
 };
 
 export interface ThreadDetailsUsageInput {
@@ -62,15 +63,15 @@ export function ThreadDetailsUsage({
   return (
     <ThreadDetailsSection
       headingId="thread-details-usage-heading"
-      title="Usage"
+      title={t("Usage")}
       showHeading={false}
     >
       <div className="grid grid-cols-[auto_minmax(3rem,1fr)_auto] gap-x-3 text-xs">
         {notice ? (
           <UsageRow
-            label="Limits"
+            label={t("Limits")}
             left={null}
-            value="Unavailable"
+            value={t("Unavailable")}
             tooltip={<span className="text-foreground">{notice}</span>}
           />
         ) : null}
@@ -101,11 +102,11 @@ function LimitRow({
       tooltip={
         <>
           <span className="text-foreground">
-            {window.label}: {left}% left
+            {t("{label}: {percent}% left", { label: window.label, percent: left })}
           </span>
           {window.resetsAt && resetsAt > now ? (
             <span className="text-muted-foreground">
-              Resets in {formatDuration(resetsAt - now)} ·{" "}
+              {t("Resets in {duration}", { duration: formatDuration(resetsAt - now) })} ·{" "}
               {formatUpcomingTimestamp(window.resetsAt, timestampFormat, now)}
             </span>
           ) : null}
@@ -131,17 +132,24 @@ function ContextRow({
   const used = formatContextWindowTokens(usage.usedTokens);
   return (
     <UsageRow
-      label="Context"
+      label={t("Context")}
       left={left}
       muted
       className={cn(spaced && "mt-2")}
       tooltip={
         <>
-          {left !== null ? <span className="text-foreground">Context: {left}% left</span> : null}
+          {left !== null ? (
+            <span className="text-foreground">
+              {t("Context: {percent}% left", { percent: left })}
+            </span>
+          ) : null}
           <span className={left !== null ? "text-muted-foreground" : "text-foreground"}>
             {maxTokens !== null
-              ? `${used} of ${formatContextWindowTokens(maxTokens)} tokens used`
-              : `${used} tokens used`}
+              ? t("{used} of {max} tokens used", {
+                  used,
+                  max: formatContextWindowTokens(maxTokens),
+                })
+              : t("{used} tokens used", { used })}
           </span>
         </>
       }
@@ -174,7 +182,7 @@ function UsageRow({
         render={
           <div
             tabIndex={0}
-            aria-label={`${label}: ${value ?? `${left}% left`}`}
+            aria-label={`${label}: ${value ?? t("{percent}% left", { percent: left })}`}
             className={cn(
               "col-span-3 grid h-6 cursor-default grid-cols-subgrid items-center rounded-lg px-2.5 outline-none hover:bg-black/[0.035] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-popup-open:bg-black/[0.035] dark:hover:bg-white/[0.08] dark:data-popup-open:bg-white/[0.08]",
               className,

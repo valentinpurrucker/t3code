@@ -1,3 +1,4 @@
+import { t } from "~/i18n";
 import type {
   EditorId,
   EnvironmentId,
@@ -114,7 +115,7 @@ export function ThreadDetailsPanel(props: ThreadDetailsPanelProps) {
         <>
           <ThreadDetailsSection
             headingId="thread-details-workspace-heading"
-            title="Workspace"
+            title={t("Workspace")}
             separated={false}
             showHeading={false}
           >
@@ -163,7 +164,7 @@ export function ThreadDetailsPanel(props: ThreadDetailsPanelProps) {
           {props.gitCwd ? (
             <ThreadDetailsSection
               headingId="thread-details-version-control-heading"
-              title="Version Control"
+              title={t("Version Control")}
               showHeading={false}
               separated={density === "full"}
             >

@@ -3,6 +3,7 @@ import { Maximize2, Minimize2 } from "lucide";
 import { MorphIcon } from "~/components/MorphIcon";
 import { memo, type ReactNode } from "react";
 
+import { t } from "~/i18n";
 import { cn } from "~/lib/utils";
 
 import type { ThreadPanelPresentation } from "../../rightPanelLayout";
@@ -44,7 +45,7 @@ export const PanelLayoutControls = memo(function PanelLayoutControls({
   rightPanelAvailable,
   rightPanelOpen,
   rightPanelShortcutLabel,
-  rightPanelUnavailableLabel = "Right panel is unavailable",
+  rightPanelUnavailableLabel = t("Right panel is unavailable"),
   onToggleTerminal,
   onToggleThreadPanel,
   onToggleRightPanel,
@@ -54,7 +55,7 @@ export const PanelLayoutControls = memo(function PanelLayoutControls({
       className="relative shrink-0 [-webkit-app-region:no-drag]"
       pressed={threadPanelOpen}
       onPressedChange={threadPanelPresentation === "popover" ? undefined : onToggleThreadPanel}
-      aria-label="Toggle thread details panel"
+      aria-label={t("Toggle thread details panel")}
       variant="ghost"
       size="sm"
     >
@@ -71,7 +72,7 @@ export const PanelLayoutControls = memo(function PanelLayoutControls({
         )}
       </TooltipTrigger>
       <TooltipPopup side="bottom">
-        Toggle thread details
+        {t("Toggle thread details")}
         {threadPanelShortcutLabel ? ` (${threadPanelShortcutLabel})` : ""}
       </TooltipPopup>
     </Tooltip>
@@ -90,7 +91,7 @@ export const PanelLayoutControls = memo(function PanelLayoutControls({
               className="shrink-0 [-webkit-app-region:no-drag]"
               pressed={terminalOpen}
               onPressedChange={onToggleTerminal}
-              aria-label="Toggle terminal drawer"
+              aria-label={t("Toggle terminal drawer")}
               variant="ghost"
               size="sm"
               disabled={!terminalAvailable}
@@ -100,8 +101,8 @@ export const PanelLayoutControls = memo(function PanelLayoutControls({
           </TooltipTrigger>
           <TooltipPopup side="bottom">
             {terminalAvailable
-              ? `Toggle terminal drawer${terminalShortcutLabel ? ` (${terminalShortcutLabel})` : ""}`
-              : "Terminal drawer is unavailable"}
+              ? `${t("Toggle terminal drawer")}${terminalShortcutLabel ? ` (${terminalShortcutLabel})` : ""}`
+              : t("Terminal drawer is unavailable")}
           </TooltipPopup>
         </Tooltip>
       ) : null}
@@ -112,7 +113,7 @@ export const PanelLayoutControls = memo(function PanelLayoutControls({
               className="shrink-0 [-webkit-app-region:no-drag]"
               pressed={rightPanelOpen}
               onPressedChange={onToggleRightPanel}
-              aria-label="Toggle right panel"
+              aria-label={t("Toggle right panel")}
               data-right-panel-toggle
               variant="ghost"
               size="sm"
@@ -123,7 +124,7 @@ export const PanelLayoutControls = memo(function PanelLayoutControls({
           </TooltipTrigger>
           <TooltipPopup side="bottom">
             {rightPanelAvailable
-              ? `Toggle right panel${rightPanelShortcutLabel ? ` (${rightPanelShortcutLabel})` : ""}`
+              ? `${t("Toggle right panel")}${rightPanelShortcutLabel ? ` (${rightPanelShortcutLabel})` : ""}`
               : rightPanelUnavailableLabel}
           </TooltipPopup>
         </Tooltip>
@@ -139,7 +140,7 @@ export const RightPanelMaximizeControl = memo(function RightPanelMaximizeControl
   maximized: boolean;
   onToggle: () => void;
 }) {
-  const label = maximized ? "Restore panel size" : "Maximize panel";
+  const label = maximized ? t("Restore panel size") : t("Maximize panel");
   return (
     <Tooltip>
       <TooltipTrigger

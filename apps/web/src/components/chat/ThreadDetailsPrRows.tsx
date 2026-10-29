@@ -1,3 +1,4 @@
+import { t } from "~/i18n";
 import { pipe } from "effect/Function";
 import { ThreadDetailsControl } from "./ThreadDetailsControl";
 import type { EnvironmentId, ScopedThreadRef, ThreadPullRequestLink } from "@t3tools/contracts";
@@ -131,7 +132,7 @@ export function ThreadDetailsPrRows({
           // Chevrons, not plus and minus: the plus already means "add" in this card.
           icon={expanded ? ChevronUp : ChevronDown}
         />
-        {expanded ? "Show less" : `Show ${rest.length} more`}
+        {expanded ? t("Show less") : t("Show {count} more", { count: rest.length })}
       </ThreadDetailsControl>
     </>
   );

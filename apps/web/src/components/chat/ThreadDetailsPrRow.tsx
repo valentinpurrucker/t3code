@@ -1,3 +1,4 @@
+import { t, tn } from "~/i18n";
 import { resolvePullRequestDetailChecks } from "@t3tools/client-runtime/pull-request-checks";
 import {
   capitalizeTerm,
@@ -244,7 +245,8 @@ export function ThreadDetailsPrRow({
   const rowTooltip =
     detail === null || statePresentation === null ? (
       <TooltipPopup side="top">
-        {status?.tooltip ?? `${capitalizeTerm(terminology.singular)} #${number}`}
+        {status?.tooltip ??
+          t("{term} #{number}", { term: capitalizeTerm(terminology.singular), number })}
       </TooltipPopup>
     ) : (
       <TooltipPopup
@@ -293,15 +295,14 @@ export function ThreadDetailsPrRow({
               <div className="flex min-w-0 items-start gap-2 text-destructive">
                 <TriangleAlertIcon aria-hidden className="mt-0.5 size-3 shrink-0 stroke-current" />
                 <div className="min-w-0 flex-1 wrap-break-word">
-                  Merge conflicts with {detail.baseBranch}
+                  {t("Merge conflicts with {branch}", { branch: detail.baseBranch })}
                 </div>
               </div>
             ) : null}
             <div className="flex min-w-0 items-center gap-2">
               <FileDiffIcon className="size-3 shrink-0 stroke-muted-foreground" />
               <div className="min-w-0 flex items-baseline gap-1 truncate text-foreground/75">
-                {detail.changedFiles.toLocaleString()}{" "}
-                {detail.changedFiles === 1 ? "file" : "files"}
+                {tn(detail.changedFiles, "{count} file", "{count} files")}
                 <PullRequestDiffStat additions={detail.additions} deletions={detail.deletions} />
               </div>
             </div>
@@ -320,42 +321,45 @@ export function ThreadDetailsPrRow({
   const trailingAction =
     rowAction === "resolve"
       ? {
-          label: "Resolve",
-          pendingLabel: "Preparing...",
+          label: t("Resolve"),
+          pendingLabel: t("Preparing…"),
           pending: handoff === "conflicts",
           destructive: true,
           suffix: <ArrowUpRightIcon aria-hidden className="size-3 shrink-0" />,
-          tooltip: "Check the branch out and resolve the conflicts in a new thread",
+          tooltip: t("Check the branch out and resolve the conflicts in a new thread"),
           onClick: startResolveConflicts,
         }
       : rowAction === "ready"
         ? {
-            label: "Ready",
-            pendingLabel: "Marking...",
+            label: t("Ready"),
+            pendingLabel: t("Marking…"),
             pending: actionPending,
             destructive: false,
             suffix: null,
-            tooltip: `Mark this ${terminology.singular} as ready for review`,
+            tooltip: t("Mark this {term} as ready for review", { term: terminology.singular }),
             onClick: () => void perform("ready"),
           }
         : rowAction === "fix"
           ? {
-              label: "Fix",
-              pendingLabel: "Preparing...",
+              label: t("Fix"),
+              pendingLabel: t("Preparing…"),
               pending: handoff === "findings",
               destructive: true,
               suffix: <ArrowUpRightIcon aria-hidden className="size-3 shrink-0" />,
-              tooltip: "Fix the failing checks in a new thread",
+              tooltip: t("Fix the failing checks in a new thread"),
               onClick: startFixChecks,
             }
           : rowAction === "merge"
             ? {
-                label: "Merge",
-                pendingLabel: "Merging...",
+                label: t("Merge"),
+                pendingLabel: t("Merging…"),
                 pending: actionPending,
                 destructive: false,
                 suffix: null,
-                tooltip: `Merge this ${terminology.singular} (${selectedMergeMethod})`,
+                tooltip: t("Merge this {term} ({method})", {
+                  term: terminology.singular,
+                  method: selectedMergeMethod,
+                }),
                 onClick: () => setConfirmingMerge(true),
               }
             : null;
@@ -373,7 +377,7 @@ export function ThreadDetailsPrRow({
               size="sm"
               part={part}
               className="group/watch"
-              aria-label={`Stop watching #${number}`}
+              aria-label={t("Stop watching #{number}", { number })}
               onClick={onStopWatching}
             />
           }
@@ -391,8 +395,9 @@ export function ThreadDetailsPrRow({
           />
         </TooltipTrigger>
         <TooltipPopup side="top">
-          Watching: the agent wakes when checks finish, someone comments, or the branch conflicts.
-          Click to stop.
+          {t(
+            "Watching: the agent wakes when checks finish, someone comments, or the branch conflicts. Click to stop.",
+          )}
         </TooltipPopup>
       </Tooltip>
     ) : null;
@@ -486,14 +491,19 @@ export function ThreadDetailsPrRow({
         <AlertDialog open={confirmingMerge} onOpenChange={(open) => setConfirmingMerge(open)}>
           <AlertDialogPopup>
             <AlertDialogHeader>
-              <AlertDialogTitle>Merge {terminology.singular}?</AlertDialogTitle>
+              <AlertDialogTitle>
+                {t("Merge {term}?", { term: terminology.singular })}
+              </AlertDialogTitle>
               <AlertDialogDescription>
-                This merges #{number} using {selectedMergeMethod}.
+                {t("This merges #{number} using {method}.", {
+                  number,
+                  method: selectedMergeMethod,
+                })}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogClose render={<Button variant="outline" size="sm" />}>
-                Cancel
+                {t("Cancel")}
               </AlertDialogClose>
               <Button
                 size="sm"
@@ -503,7 +513,7 @@ export function ThreadDetailsPrRow({
                   void perform("merge", selectedMergeMethod);
                 }}
               >
-                Merge
+                {t("Merge")}
               </Button>
             </AlertDialogFooter>
           </AlertDialogPopup>

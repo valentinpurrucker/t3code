@@ -1,3 +1,4 @@
+import { t } from "~/i18n";
 import type { Root, RootContent } from "mdast";
 import {
   resolveWorkEntryToolPresentation,
@@ -112,7 +113,7 @@ export function buildToolCallExpandedBody(
             "input" in workEntry.toolData
           ? workEntry.toolData.input
           : undefined;
-    if (input !== undefined) addBlock(`Tool input\n${JSON.stringify(input, null, 2)}`);
+    if (input !== undefined) addBlock(`${t("Tool input")}\n${JSON.stringify(input, null, 2)}`);
   }
   const command = workEntry.command?.trim();
   const raw = workEntryRawCommand(workEntry);
