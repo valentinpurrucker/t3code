@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 import { useEffect, useEffectEvent, useState } from "react";
 
 import { newMessageId, newThreadId } from "~/lib/utils";
+import { t } from "~/i18n";
 import { useProjects, useThreadShell } from "../state/entities";
 import { usePrimaryEnvironmentId } from "../state/environments";
 import { primaryServerProvidersAtom } from "../state/server";
@@ -113,7 +114,7 @@ export function DevReplayHost() {
     replay(scenario).catch((error: unknown) =>
       toastManager.add({
         type: "error",
-        title: "Replay failed",
+        title: t("Replay failed"),
         description: error instanceof Error ? error.message : String(error),
       }),
     );
@@ -124,13 +125,15 @@ export function DevReplayHost() {
       <DialogPopup className="sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>
-            {project === undefined ? "Replay a recorded turn" : `Replay in ${project.title}`}
+            {project === undefined
+              ? t("Replay a recorded turn")
+              : t("Replay in {project}", { project: project.title })}
           </DialogTitle>
         </DialogHeader>
         <DialogPanel>
           {scenarios.length === 0 || project === undefined ? (
             <p className="text-sm text-muted-foreground">
-              Needs a project and the Replay (dev) provider, which dev servers start.
+              {t("Needs a project and the Replay (dev) provider, which dev servers start.")}
             </p>
           ) : (
             <div className="flex flex-col items-start gap-1">

@@ -1,3 +1,4 @@
+import { t, tn } from "~/i18n";
 import { appAtomRegistry } from "../rpc/atomRegistry";
 import { primaryServerLegacyThreadMigrationAtom } from "../state/server";
 import { toastManager } from "./ui/toast";
@@ -15,10 +16,12 @@ export function startLegacyThreadMigrationToast(): () => void {
         if (toastId !== null) return;
         toastId = toastManager.add({
           type: "loading",
-          title: "Restoring your threads…",
-          description: `Migrating ${migration.totalThreadCount.toLocaleString()} ${
-            migration.totalThreadCount === 1 ? "thread" : "threads"
-          } from the previous version. You can keep working while this finishes.`,
+          title: t("Restoring your threads…"),
+          description: tn(
+            migration.totalThreadCount,
+            "Migrating {count} thread from the previous version. You can keep working while this finishes.",
+            "Migrating {count} threads from the previous version. You can keep working while this finishes.",
+          ),
           timeout: 0,
         });
         return;

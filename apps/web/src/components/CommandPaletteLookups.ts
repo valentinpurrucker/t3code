@@ -6,6 +6,7 @@ import {
 } from "@t3tools/contracts";
 
 import { isDesktopLocalConnectionTarget } from "../connection/desktopLocal";
+import { t } from "~/i18n";
 import { useClientSettings } from "../hooks/useSettings";
 import { getProjectOrderKey } from "@t3tools/client-runtime/state/project-grouping";
 import { useProjects, useThreadShells } from "../state/entities";
@@ -30,7 +31,11 @@ export function useEnvironmentLookups() {
         environment.environmentId,
         {
           kind: isLocal ? "local" : "remote",
-          label: isPrimary ? "Local" : isLocal ? `${environment.label} (Local)` : environment.label,
+          label: isPrimary
+            ? t("Local")
+            : isLocal
+              ? t("{label} (Local)", { label: environment.label })
+              : environment.label,
           machine: resolveEnvironmentMachineKind(environment.serverConfig),
         },
       ] as const;

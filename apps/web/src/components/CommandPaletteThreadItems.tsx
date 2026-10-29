@@ -30,6 +30,7 @@ import {
   usePrimaryEnvironmentId,
 } from "../state/environments";
 import { useThreadSearch } from "../state/queries";
+import { t } from "~/i18n";
 import { primaryServerProvidersAtom } from "../state/server";
 import { threadEnvironment } from "../state/threads";
 import { useAtomCommand } from "../state/use-atom-command";
@@ -142,7 +143,7 @@ export function useCommandPaletteThreadItems(input: {
           project={projectByKey.get(`${thread.environmentId}:${thread.projectId}`) ?? null}
           projectTitle={projectTitle ?? null}
           environmentLabel={
-            projectEnvironmentLocationById.get(thread.environmentId)?.label ?? "Remote"
+            projectEnvironmentLocationById.get(thread.environmentId)?.label ?? t("Remote")
           }
           branch={thread.branch}
           worktreePath={thread.worktreePath}

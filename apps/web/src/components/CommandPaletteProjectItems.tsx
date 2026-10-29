@@ -1,6 +1,7 @@
 import type { EnvironmentId, EnvironmentMachineKind } from "@t3tools/contracts";
 
 import type { SidebarProjectSnapshot } from "../sidebarProjectGrouping";
+import { t } from "~/i18n";
 import type { Project } from "../types";
 import {
   buildCommandPaletteProjectMetadata,
@@ -20,7 +21,7 @@ export interface CommandPaletteProjectLocation {
 
 const UNKNOWN_PROJECT_LOCATION: CommandPaletteProjectLocation = {
   kind: "remote",
-  label: "Remote",
+  label: t("Remote"),
   machine: "server",
 };
 

@@ -3,6 +3,7 @@ import type { AnyRouter } from "@tanstack/react-router";
 import * as Schema from "effect/Schema";
 import { Atom } from "effect/reactivity";
 
+import { t } from "~/i18n";
 import { getLocalStorageItem, setLocalStorageItem } from "../hooks/useLocalStorage";
 import { appAtomRegistry } from "../rpc/atomRegistry";
 import { environmentSummaries } from "../state/presentation";
@@ -42,13 +43,14 @@ function showPermissionNotice(
     toastManager.close(id);
   };
   const id = toastManager.add({
-    title: `Permissions have changed for ${label}`,
-    description:
+    title: t("Permissions have changed for {label}", { label }),
+    description: t(
       "This connection still uses the old permissions, so some actions may no longer be available. Pair again using a new link with the permissions you need.",
+    ),
     timeout: 0,
     onClose: persistDismissal,
     actionProps: {
-      children: "Open Sharing & access",
+      children: t("Open Sharing & access"),
       onClick: () => {
         dismiss();
         void router.navigate({ to: "/settings/access" });
@@ -56,7 +58,7 @@ function showPermissionNotice(
     },
     data: {
       actionLayout: "stacked-end",
-      secondaryActionProps: { children: "Dismiss", onClick: dismiss },
+      secondaryActionProps: { children: t("Dismiss"), onClick: dismiss },
       secondaryActionVariant: "ghost",
     },
   });
