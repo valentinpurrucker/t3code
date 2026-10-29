@@ -7,6 +7,7 @@ import {
   IMAGE_DIMENSIONS_HEADER_BYTES,
   readImageDimensions,
 } from "@t3tools/shared/imageDimensions";
+import { t } from "~/i18n";
 
 const MAX_DIMENSION = IMAGE_ATTACHMENT_MAX_EDGE;
 export const MAX_STASH_IMAGE_DATA_URL_CHARS = 1_300_000;
@@ -126,10 +127,10 @@ export function readFileAsDataUrl(file: Blob): Promise<string> {
         resolve(reader.result);
         return;
       }
-      reject(new Error("Could not read image data."));
+      reject(new Error(t("Could not read image data.")));
     });
     reader.addEventListener("error", () => {
-      reject(reader.error ?? new Error("Failed to read image."));
+      reject(reader.error ?? new Error(t("Failed to read image.")));
     });
     reader.readAsDataURL(file);
   });

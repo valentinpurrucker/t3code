@@ -10,6 +10,7 @@ import {
 
 import { useOpenLink } from "../browser/useOpenLink";
 import { useClientSettings } from "../hooks/useSettings";
+import { t } from "~/i18n";
 import { stackedThreadToast, toastManager } from "../components/ui/toast";
 import { useRightPanelStore } from "../rightPanelStore";
 
@@ -132,8 +133,8 @@ export function useOpenPrLink(threadRef?: ScopedThreadRef) {
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Unable to open pull request link",
-          description: error instanceof Error ? error.message : "An error occurred.",
+          title: t("Unable to open pull request link"),
+          description: error instanceof Error ? error.message : t("An error occurred."),
         }),
       );
     });

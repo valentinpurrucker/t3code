@@ -1,5 +1,7 @@
 import { type TimestampFormat } from "@t3tools/contracts/settings";
 
+import { locale, t } from "~/i18n";
+
 function getTimestampFormatOptions(
   timestampFormat: TimestampFormat,
   includeSeconds: boolean,
@@ -97,10 +99,11 @@ export function parseTimestampDate(isoDate: string): Date | null {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
-// Deliberately not the host locale: the tooltip's ordinal suffix and
-// day-before-month order below are English, so a localized month alone would
-// read "4th Juni 2026".
-const monthNameFormatter = new Intl.DateTimeFormat("en-US", { month: "long" });
+// The tooltip's ordinal suffix and day-before-month order are English-only, so
+// German uses a plain day-first date instead.
+const monthNameFormatter = new Intl.DateTimeFormat(locale === "de" ? "de-DE" : "en-US", {
+  month: "long",
+});
 
 function ordinalSuffix(day: number): string {
   const lastTwo = day % 100;
@@ -127,7 +130,9 @@ export function formatChatTimestampTooltip(
   const day = date.getDate();
   const month = monthNameFormatter.format(date);
   const year = date.getFullYear();
-  return `${time}, ${day}${ordinalSuffix(day)} ${month} ${year}`;
+  return locale === "de"
+    ? `${day}. ${month} ${year}, ${time}`
+    : `${time}, ${day}${ordinalSuffix(day)} ${month} ${year}`;
 }
 
 export function formatShortTimestamp(isoDate: string, timestampFormat: TimestampFormat): string {
@@ -162,7 +167,7 @@ export function formatDayAwareTimestamp(
   const dayDiff = Math.round((startOfToday - startOfMessageDay) / 86_400_000);
 
   if (dayDiff <= 0) return time;
-  if (dayDiff === 1) return `yesterday at ${time}`;
+  if (dayDiff === 1) return t("yesterday at {time}", { time });
   const dateFormatter =
     date.getFullYear() === now.getFullYear() ? numericDateFormatter : numericDateWithYearFormatter;
   return `${dateFormatter.format(date)} ${time}`;
@@ -184,7 +189,7 @@ export function formatUpcomingTimestamp(
 
   if (dayDiff < 0) return formatDayAwareTimestamp(isoDate, timestampFormat, nowMs);
   if (dayDiff === 0) return time;
-  if (dayDiff === 1) return `tomorrow at ${time}`;
+  if (dayDiff === 1) return t("tomorrow at {time}", { time });
   const dateFormatter =
     date.getFullYear() === now.getFullYear() ? numericDateFormatter : numericDateWithYearFormatter;
   return `${dateFormatter.format(date)} ${time}`;
@@ -229,14 +234,18 @@ export function msUntilRelativeTimeChange(
 }
 
 export function formatRelativeElapsed(elapsedMs: number): RelativeTimeParts {
+  // German puts the preposition before the duration ("vor 5m"). The parts API only
+  // appends a suffix, so fold it into the value and leave the suffix empty.
+  const ago = (value: string): RelativeTimeParts =>
+    locale === "de" ? { value: `vor ${value}`, suffix: null } : { value, suffix: t("ago") };
   const seconds = Math.floor(elapsedMs / 1000);
-  if (seconds < 60) return { value: "just now", suffix: null };
+  if (seconds < 60) return { value: t("just now"), suffix: null };
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return { value: `${minutes}m`, suffix: "ago" };
+  if (minutes < 60) return ago(`${minutes}m`);
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return { value: `${hours}h`, suffix: "ago" };
+  if (hours < 24) return ago(`${hours}h`);
   const days = Math.floor(hours / 24);
-  return { value: `${days}d`, suffix: "ago" };
+  return ago(`${days}d`);
 }
 
 export function formatRelativeTime(
@@ -257,10 +266,10 @@ export function formatElapsedDurationLabel(isoDate: string, nowMs: number = Date
   const date = parseTimestampDate(isoDate);
   if (!date) return "";
   const diffMs = nowMs - date.getTime();
-  if (diffMs <= 0) return "just now";
+  if (diffMs <= 0) return t("just now");
 
   const seconds = Math.floor(diffMs / 1000);
-  if (seconds < 5) return "just now";
+  if (seconds < 5) return t("just now");
   if (seconds < 60) return `${seconds}s`;
 
   const minutes = Math.floor(seconds / 60);
@@ -278,16 +287,18 @@ export function formatExpiresInLabel(isoDate: string, nowMs: number = Date.now()
   const date = parseTimestampDate(isoDate);
   if (!date) return "";
   const diffMs = date.getTime() - nowMs;
-  if (diffMs <= 0) return "Expired";
+  if (diffMs <= 0) return t("Expired");
 
   const totalSeconds = Math.floor(diffMs / 1000);
-  if (totalSeconds < 5) return "Expires in a moment";
-  if (totalSeconds < 60) return `Expires in ${totalSeconds}s`;
+  if (totalSeconds < 5) return t("Expires in a moment");
+  if (totalSeconds < 60) return t("Expires in {time}", { time: `${totalSeconds}s` });
 
   if (totalSeconds < 3600) {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    return seconds === 0 ? `Expires in ${minutes}m` : `Expires in ${minutes}m ${seconds}s`;
+    return t("Expires in {time}", {
+      time: seconds === 0 ? `${minutes}m` : `${minutes}m ${seconds}s`,
+    });
   }
 
   if (totalSeconds < 86_400) {
@@ -298,12 +309,12 @@ export function formatExpiresInLabel(isoDate: string, nowMs: number = Date.now()
     const parts = [`${hours}h`];
     if (minutes > 0) parts.push(`${minutes}m`);
     if (seconds > 0) parts.push(`${seconds}s`);
-    return `Expires in ${parts.join(" ")}`;
+    return t("Expires in {time}", { time: parts.join(" ") });
   }
 
   const days = Math.floor(totalSeconds / 86_400);
   const remAfterDays = totalSeconds % 86_400;
-  if (remAfterDays === 0) return `Expires in ${days}d`;
+  if (remAfterDays === 0) return t("Expires in {time}", { time: `${days}d` });
   const hours = Math.floor(remAfterDays / 3600);
   const rem = remAfterDays % 3600;
   const minutes = Math.floor(rem / 60);
@@ -312,5 +323,7 @@ export function formatExpiresInLabel(isoDate: string, nowMs: number = Date.now()
   if (hours > 0) tail.push(`${hours}h`);
   if (minutes > 0) tail.push(`${minutes}m`);
   if (seconds > 0) tail.push(`${seconds}s`);
-  return tail.length > 0 ? `Expires in ${days}d ${tail.join(" ")}` : `Expires in ${days}d`;
+  return t("Expires in {time}", {
+    time: tail.length > 0 ? `${days}d ${tail.join(" ")}` : `${days}d`,
+  });
 }

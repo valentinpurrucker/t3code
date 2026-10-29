@@ -1,5 +1,7 @@
 import type { DesktopBridge, DesktopUpdateState } from "@t3tools/contracts";
 
+import { t } from "~/i18n";
+
 const FALLBACK_TRIAGE_COMMAND = "npx t3 triage";
 const DOWNLOAD_URL = "https://t3.codes/download";
 const ISSUE_URL = "https://github.com/pingdotgg/t3code/issues/new";
@@ -7,9 +9,9 @@ const LAST_FAILURE_KEY = "t3code:boot-failed-at";
 const REPEAT_FAILURE_MS = 5 * 60_000;
 const MAX_CAUSES = 3;
 const MAX_ERROR_CHARS = 6_000;
-const COPY_BLOCKED = "Copy was blocked. The text is selected so you can copy it manually.";
-const UPDATE_DOWNLOAD_FAILED = "The update download failed. Try Download update again.";
-const UPDATE_INSTALL_FAILED = "The update install failed. Try Restart to update again.";
+const COPY_BLOCKED = t("Copy was blocked. The text is selected so you can copy it manually.");
+const UPDATE_DOWNLOAD_FAILED = t("The update download failed. Try Download update again.");
+const UPDATE_INSTALL_FAILED = t("The update install failed. Try Restart to update again.");
 
 /** The Windows launcher is a `.cmd` run from PowerShell, which needs `&` to run a quoted path. */
 function launcherCommand(launcherPath: string) {
@@ -190,7 +192,9 @@ function copyText(target: HTMLElement, onCopied: () => void, onBlocked: (hint: s
     selectContents(target);
     if (copySelection()) return onCopied();
     onBlocked(
-      /Mac|iPhone|iPad/.test(navigator.platform) ? "Press ⌘C to copy" : "Press Ctrl+C to copy",
+      /Mac|iPhone|iPad/.test(navigator.platform)
+        ? t("Press ⌘C to copy")
+        : t("Press Ctrl+C to copy"),
     );
   };
   const clipboard = window.isSecureContext ? navigator.clipboard : undefined;
@@ -210,10 +214,10 @@ function mountUpdateButton(
     button.hidden = action === null;
     // aria-disabled keeps keyboard focus on the button while the download runs.
     button.setAttribute("aria-disabled", String(action?.kind === "downloading"));
-    if (action?.kind === "download") button.textContent = "Download update";
+    if (action?.kind === "download") button.textContent = t("Download update");
     if (action?.kind === "downloading")
-      button.textContent = `Downloading update (${action.percent}%)`;
-    if (action?.kind === "install") button.textContent = "Restart to update";
+      button.textContent = t("Downloading update ({percent}%)", { percent: action.percent });
+    if (action?.kind === "install") button.textContent = t("Restart to update");
     const failure = !action
       ? ""
       : state.errorContext === "download"
@@ -274,11 +278,11 @@ export function showBootError(error: unknown) {
   };
 
   const message = element("div", {}, [
-    element("h1", { textContent: "T3 Code failed to start" }),
+    element("h1", { textContent: t("T3 Code failed to start") }),
     element("p", {
       textContent: offline
-        ? "This browser appears to be offline. Check the connection, then reload."
-        : "We are not sure why. Try a reload first.",
+        ? t("This browser appears to be offline. Check the connection, then reload.")
+        : t("We are not sure why. Try a reload first."),
     }),
   ]);
   message.setAttribute("role", "alert");
@@ -286,7 +290,7 @@ export function showBootError(error: unknown) {
   const reload = element("button", {
     id: "boot-error-reload",
     type: "button",
-    textContent: "Reload",
+    textContent: t("Reload"),
   });
   reload.addEventListener("click", () => window.location.reload());
   const update = element("button", { id: "boot-error-update", type: "button", hidden: true });
@@ -297,18 +301,18 @@ export function showBootError(error: unknown) {
   const copyCommand = element("button", {
     className: "boot-error-icon",
     type: "button",
-    title: "Copy command",
+    title: t("Copy command"),
     innerHTML: COPY_ICON,
   });
-  copyCommand.setAttribute("aria-label", "Copy command");
+  copyCommand.setAttribute("aria-label", t("Copy command"));
   copyCommand.addEventListener("click", () =>
     copyText(
       command,
       () => {
         copyCommand.innerHTML = CHECK_ICON;
-        copyCommand.title = "Copied";
-        copyCommand.setAttribute("aria-label", "Copied");
-        announce("Copied to clipboard.");
+        copyCommand.title = t("Copied");
+        copyCommand.setAttribute("aria-label", t("Copied"));
+        announce(t("Copied to clipboard."));
       },
       (hint) => {
         copyCommand.textContent = hint;
@@ -327,13 +331,13 @@ export function showBootError(error: unknown) {
     console.warn("Could not describe the startup error.", reportError);
   }
   const details = element("pre", { id: "boot-error-details", tabIndex: 0, textContent: report });
-  const copyDetails = element("button", { type: "button", textContent: "Copy error details" });
+  const copyDetails = element("button", { type: "button", textContent: t("Copy error details") });
   copyDetails.addEventListener("click", () =>
     copyText(
       details,
       () => {
-        copyDetails.textContent = "Copied";
-        announce("Copied to clipboard.");
+        copyDetails.textContent = t("Copied");
+        announce(t("Copied to clipboard."));
       },
       (hint) => {
         copyDetails.textContent = hint;
@@ -353,32 +357,33 @@ export function showBootError(error: unknown) {
   const nightly = environment.channel === "nightly";
 
   const more = element("details", { open: isRepeatFailure(Date.now()) }, [
-    element("summary", { textContent: "More options if it keeps failing" }),
+    element("summary", { textContent: t("More options if it keeps failing") }),
     ...(bridge
       ? [
           link(
             nightly ? `${DOWNLOAD_URL}?channel=nightly` : DOWNLOAD_URL,
             nightly
-              ? "Download and reinstall the latest nightly build"
-              : "Download and reinstall T3 Code",
+              ? t("Download and reinstall the latest nightly build")
+              : t("Download and reinstall T3 Code"),
           ),
         ]
       : []),
     element("div", {}, [
       element("p", {
-        textContent:
+        textContent: t(
           "Run this on the computer that runs T3 Code. Your agent can check the local logs and help you file a bug report.",
+        ),
       }),
       element("div", { id: "boot-error-command" }, [command, copyCommand]),
     ]),
     element("div", {}, [
       details,
       element("p", {
-        textContent: "Details may include local file paths and names. Check before sharing.",
+        textContent: t("Details may include local file paths and names. Check before sharing."),
       }),
       element("div", { id: "boot-error-report" }, [
         copyDetails,
-        link(issue.href, "File a bug report on GitHub"),
+        link(issue.href, t("File a bug report on GitHub")),
       ]),
     ]),
   ]);

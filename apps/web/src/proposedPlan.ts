@@ -1,3 +1,4 @@
+import { t } from "~/i18n";
 import { stripDisplayedPlanMarkdown, proposedPlanTitle } from "@t3tools/shared/proposedPlanText";
 
 export function buildCollapsedProposedPlanPreviewMarkdown(
@@ -32,7 +33,7 @@ export function buildCollapsedProposedPlanPreviewMarkdown(
   }
 
   if (previewLines.length === 0) {
-    return proposedPlanTitle(planMarkdown) ?? "Plan preview unavailable.";
+    return proposedPlanTitle(planMarkdown) ?? t("Plan preview unavailable.");
   }
 
   if (hasMoreContent) {

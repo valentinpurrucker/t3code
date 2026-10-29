@@ -17,6 +17,7 @@ import { Atom } from "effect/reactivity";
 import { appAtomRegistry } from "~/rpc/atomRegistry";
 import { environmentServerConfigsAtom } from "~/state/server";
 import { threadEnvironment } from "~/state/threads";
+import { t } from "~/i18n";
 import { useAtomCommand } from "~/state/use-atom-command";
 
 // A primitive mode prevents unchanged status pushes from re-rendering every link.
@@ -56,7 +57,7 @@ export function usePullRequestLinking(environmentId: EnvironmentId | null | unde
       threadRef.environmentId !== environmentId ||
       (linked && !canLink(url))
     )
-      throw new Error("The pull request is not available in this environment.");
+      throw new Error(t("The pull request is not available in this environment."));
     const mutation = planThreadPullRequestMutation({
       capabilities: appAtomRegistry.get(environmentServerConfigsAtom).get(threadRef.environmentId)
         ?.environment.capabilities,
@@ -65,12 +66,12 @@ export function usePullRequestLinking(environmentId: EnvironmentId | null | unde
       linked,
     });
     if (mutation === null)
-      throw new Error("This environment does not support linking this pull request.");
+      throw new Error(t("This environment does not support linking this pull request."));
     const result = await (mutation.type === "thread.pull-request.link"
       ? link({ environmentId: threadRef.environmentId, input: mutation.input })
       : unlink({ environmentId: threadRef.environmentId, input: mutation.input }));
     if (result._tag === "Failure") {
-      if (isAtomCommandInterrupted(result)) throw new Error("Link update interrupted.");
+      if (isAtomCommandInterrupted(result)) throw new Error(t("Link update interrupted."));
       throw squashAtomCommandFailure(result);
     }
   };

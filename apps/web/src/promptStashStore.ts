@@ -2,6 +2,8 @@ import { ComposerContextRecord, ForwardCompatibleArray } from "@t3tools/contract
 import * as Schema from "effect/Schema";
 import { create } from "zustand";
 
+import { t } from "~/i18n";
+
 import {
   PersistedComposerFileAttachment,
   PersistedComposerImageAttachment,
@@ -48,9 +50,8 @@ function clearOrphanedPendingImages(
       pendingImageCount: 0,
       unreadableImageNames: [
         ...(entry.unreadableImageNames ?? []),
-        ...Array.from(
-          { length: lostCount },
-          (_, index) => `image ${index + 1} (not saved before reload)`,
+        ...Array.from({ length: lostCount }, (_, index) =>
+          t("image {index} (not saved before reload)", { index: index + 1 }),
         ),
       ],
     };

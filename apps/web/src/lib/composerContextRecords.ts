@@ -44,6 +44,7 @@ import {
   type TerminalContextDraft,
 } from "./terminalContext";
 import type { ReviewCommentContext } from "~/reviewCommentContext";
+import { t, tn } from "~/i18n";
 
 const PREVIEW_LABEL_MAX_CHARS = 48;
 
@@ -67,9 +68,13 @@ export function reviewCommentContextLabel(comment: ReviewCommentPresentation): s
     return `#${pullRequestNumber}`;
   }
   const diffRange = /^([+-])(\d+)(?: to \1(\d+))?$/u.exec(comment.rangeLabel);
-  const rangeLabel = diffRange
-    ? `L${diffRange[2]}${diffRange[3] ? ` to L${diffRange[3]}` : ""}${diffRange[1] === "-" ? " (before)" : ""}`
+  const lineRange = diffRange
+    ? diffRange[3]
+      ? t("L{start} to L{end}", { start: diffRange[2], end: diffRange[3] })
+      : `L${diffRange[2]}`
     : comment.rangeLabel;
+  const rangeLabel =
+    diffRange && diffRange[1] === "-" ? t("{range} (before)", { range: lineRange }) : lineRange;
   return `${basename(comment.filePath)} ${rangeLabel}`;
 }
 
@@ -98,13 +103,38 @@ export function pullRequestContextDisplayState(
   return pullRequest.state === "open" && pullRequest.isDraft ? "draft" : pullRequest.state;
 }
 
+/** The provider noun is translated here so German can capitalize it inside a phrase. */
+function localizedChangeRequestTerm(term: string): string {
+  switch (term) {
+    case "pull request":
+      return t("pull request");
+    case "merge request":
+      return t("merge request");
+    case "change request":
+      return t("change request");
+    default:
+      return term;
+  }
+}
+
 export function pullRequestContextKindLabel(comment: ReviewCommentPresentation): string {
   const url = comment.pullRequest?.url;
   const host = url === undefined ? null : sourceControlClients.findByChangeRequestUrl(url);
-  const term = (host ?? sourceControlClients.get(undefined)).changeRequest.singular;
+  const term = localizedChangeRequestTerm(
+    (host ?? sourceControlClients.get(undefined)).changeRequest.singular,
+  );
   const state = pullRequestContextDisplayState(comment);
   if (state === null) return capitalizeTerm(term);
-  return `${capitalizeTerm(state)} ${term}`;
+  switch (state) {
+    case "open":
+      return t("Open {term}", { term });
+    case "draft":
+      return t("Draft {term}", { term });
+    case "merged":
+      return t("Merged {term}", { term });
+    case "closed":
+      return t("Closed {term}", { term });
+  }
 }
 
 export function previewAnnotationContextLabel(annotation: PreviewAnnotationPayload): string {
@@ -114,7 +144,7 @@ export function previewAnnotationContextLabel(annotation: PreviewAnnotationPaylo
       ? `${comment.slice(0, PREVIEW_LABEL_MAX_CHARS - 1)}…`
       : comment;
   }
-  return annotation.pageTitle?.trim() || "Preview annotation";
+  return annotation.pageTitle?.trim() || t("Preview annotation");
 }
 
 export function terminalContextReference(context: TerminalContextDraft): ComposerContextReference {
@@ -214,11 +244,14 @@ export function reviewCommentContextRecord(
 
 function previewAnnotationTargetSummary(annotation: PreviewAnnotationPayload): string {
   const parts: string[] = [];
-  const plural = (count: number, noun: string) => `${count} ${noun}${count === 1 ? "" : "s"}`;
   if (annotation.elements.length > 0)
-    parts.push(plural(annotation.elements.length, "selected element"));
-  if (annotation.regions.length > 0) parts.push(plural(annotation.regions.length, "marked region"));
-  if (annotation.strokes.length > 0) parts.push(plural(annotation.strokes.length, "drawing"));
+    parts.push(
+      tn(annotation.elements.length, "{count} selected element", "{count} selected elements"),
+    );
+  if (annotation.regions.length > 0)
+    parts.push(tn(annotation.regions.length, "{count} marked region", "{count} marked regions"));
+  if (annotation.strokes.length > 0)
+    parts.push(tn(annotation.strokes.length, "{count} drawing", "{count} drawings"));
   return parts.join(", ");
 }
 

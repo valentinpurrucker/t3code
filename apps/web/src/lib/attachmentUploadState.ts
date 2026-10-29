@@ -1,5 +1,7 @@
 import type { EnvironmentId } from "@t3tools/contracts";
 
+import { t } from "~/i18n";
+
 export type ReadyAttachmentUpload = {
   readonly status: "ready";
   readonly environmentId: EnvironmentId;
@@ -40,7 +42,7 @@ export function attachmentUploadBlockReason(input: {
   }
 
   if (pending > 0) {
-    return pending === 1 ? "Attachment still uploading" : "Attachments still uploading";
+    return pending === 1 ? t("Attachment still uploading") : t("Attachments still uploading");
   }
   return null;
 }

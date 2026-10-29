@@ -7,6 +7,8 @@ import { EnvironmentId, RunId, ThreadId, type ScopedThreadRef } from "@t3tools/c
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+import { t } from "~/i18n";
+
 import { useClosedViewStore } from "./closedViewStore";
 import { resolveStorage } from "./lib/storage";
 import type { ThreadPanelPresentation } from "./rightPanelLayout";
@@ -677,7 +679,7 @@ export const useRightPanelStore = create<RightPanelStoreState>()(
             ...current,
             surfaces: current.surfaces.map((surface) =>
               surface.id === surfaceId && surface.kind === "device"
-                ? { ...surface, title: title.trim() || surface.target?.name || "Device" }
+                ? { ...surface, title: title.trim() || surface.target?.name || t("Device") }
                 : surface,
             ),
           })),

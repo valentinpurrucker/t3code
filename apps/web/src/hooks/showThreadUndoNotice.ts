@@ -6,6 +6,7 @@ import {
 import { create } from "zustand";
 
 import { stackedThreadToast, toastManager } from "../components/ui/toast";
+import { t, tn } from "~/i18n";
 import { shortcutLabelForCommand } from "../keybindings";
 import { announce, cancelAnnouncement } from "../lib/announce";
 import { appAtomRegistry } from "../rpc/atomRegistry";
@@ -29,13 +30,24 @@ type UndoNotice = {
 export const useThreadUndoNotice = create<{ notice: UndoNotice | null }>(() => ({ notice: null }));
 
 function threadUndoNoticeSummary(notice: Pick<UndoNotice, "action" | "count">): string {
-  const noun = notice.action === "Discarded" ? "draft" : "thread";
-  return `${notice.action} ${notice.count} ${noun}${notice.count === 1 ? "" : "s"}`;
+  const count = notice.count;
+  switch (notice.action) {
+    case "Settled":
+      return tn(count, "Settled {count} thread", "Settled {count} threads");
+    case "Snoozed":
+      return tn(count, "Snoozed {count} thread", "Snoozed {count} threads");
+    case "Unpinned":
+      return tn(count, "Unpinned {count} thread", "Unpinned {count} threads");
+    case "Archived":
+      return tn(count, "Archived {count} thread", "Archived {count} threads");
+    case "Discarded":
+      return tn(count, "Discarded {count} draft", "Discarded {count} drafts");
+  }
 }
 
 export function threadUndoLabel(keybindings: Parameters<typeof shortcutLabelForCommand>[0]) {
   const shortcut = shortcutLabelForCommand(keybindings, "thread.undo");
-  return shortcut ? `${shortcut} to undo` : "Undo";
+  return shortcut ? t("{shortcut} to undo", { shortcut }) : t("Undo");
 }
 
 let announcedSummary: string | null = null;
@@ -94,7 +106,7 @@ function refreshNotice() {
               stackedThreadToast({
                 type: "error",
                 title: failureTitle,
-                description: error instanceof Error ? error.message : "An error occurred.",
+                description: error instanceof Error ? error.message : t("An error occurred."),
               }),
             );
           };

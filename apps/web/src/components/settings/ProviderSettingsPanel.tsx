@@ -186,7 +186,7 @@ function ProviderLastChecked({ environmentId }: { environmentId: EnvironmentId }
           {lastCheckedRelative.suffix}
         </>
       ) : (
-        <>Checked {lastCheckedRelative.value}</>
+        <>{t("Checked {value}", { value: lastCheckedRelative.value })}</>
       )}
     </span>
   );

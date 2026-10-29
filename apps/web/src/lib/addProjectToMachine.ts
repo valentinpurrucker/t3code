@@ -17,6 +17,7 @@ import { suggestAppAccessForRemote } from "../components/sourceControlAppAccessT
 import { environmentProjectClonesAtom, silenceProjectCloneToasts } from "../state/projectClones";
 import { projectEnvironment } from "../state/projects";
 import { sourceControlEnvironment } from "../state/sourceControl";
+import { t, tn } from "~/i18n";
 
 /** Matches the server's read cap: a larger file would arrive truncated. */
 export const COPYABLE_FILE_MAX_BYTES = 1024 * 1024;
@@ -43,7 +44,7 @@ export interface AddProjectToMachineInput {
 
 function failureMessage(result: Parameters<typeof squashAtomCommandFailure>[0]): string {
   const error = squashAtomCommandFailure(result);
-  return error instanceof Error ? error.message : "An error occurred.";
+  return error instanceof Error ? error.message : t("An error occurred.");
 }
 
 /**
@@ -115,7 +116,7 @@ export async function addProjectToMachine(input: AddProjectToMachineInput): Prom
         { label: "Read file to copy", reportFailure: false, refresh: true },
       );
       if (result._tag === "Failure") return { relativePath, error: failureMessage(result) };
-      if (result.value.truncated) return { relativePath, error: "Too large to copy." };
+      if (result.value.truncated) return { relativePath, error: t("Too large to copy.") };
       return { relativePath, contents: result.value.contents };
     }),
   );
@@ -183,7 +184,12 @@ export async function addProjectToMachine(input: AddProjectToMachineInput): Prom
         ? null
         : {
             phase: "failed",
-            title: `Could not copy ${failed.length} ${failed.length === 1 ? "file" : "files"} to ${input.target.label}`,
+            title: tn(
+              failed.length,
+              "Could not copy {count} file to {label}",
+              "Could not copy {count} files to {label}",
+              { label: input.target.label },
+            ),
             failures: failed,
           },
     );
