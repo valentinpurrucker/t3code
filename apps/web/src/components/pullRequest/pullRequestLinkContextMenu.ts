@@ -5,6 +5,7 @@ import {
 } from "@t3tools/client-runtime/source-control-clients";
 
 import { writeTextToClipboard } from "~/hooks/useCopyToClipboard";
+import { t } from "~/i18n";
 import { readLocalApi } from "~/localApi";
 
 import { toastManager } from "../ui/toast";
@@ -12,13 +13,15 @@ import { toastManager } from "../ui/toast";
 export type PullRequestLinkContextMenuAction = "copy-link" | "open-external";
 
 export const openOnHostLabel = (host: SourceControlDefinition): string =>
-  host === UNKNOWN_SOURCE_CONTROL_CLIENT ? "Open on host" : `Open on ${host.label}`;
+  host === UNKNOWN_SOURCE_CONTROL_CLIENT
+    ? t("Open on host")
+    : t("Open on {host}", { host: host.label });
 
 function pullRequestLinkContextMenuItems(
   openLabel: string,
 ): readonly ContextMenuItem<PullRequestLinkContextMenuAction>[] {
   return [
-    { id: "copy-link", label: "Copy link", icon: "copy" },
+    { id: "copy-link", label: t("Copy link"), icon: "copy" },
     { id: "open-external", label: openLabel },
   ];
 }
@@ -46,7 +49,7 @@ export async function showPullRequestLinkContextMenu({
   } catch {
     toastManager.add({
       type: "error",
-      title: action === "copy-link" ? "Could not copy the link" : "Could not open the link",
+      title: action === "copy-link" ? t("Could not copy the link") : t("Could not open the link"),
     });
   }
 }

@@ -20,6 +20,8 @@ import type {
 } from "@t3tools/contracts";
 
 import { toSortableTimestamp } from "@t3tools/client-runtime/state/thread-sort";
+import { t } from "~/i18n";
+
 import type { PullRequestListSort } from "./pullRequestListPreferences";
 
 export interface EnvironmentPullRequestEntry extends PullRequestListEntry {
@@ -60,9 +62,9 @@ const pullRequestViewerKey = (entry: ScopedEntry): string =>
   `${entry.environmentId ?? ""} ${entry.host}`;
 
 const GROUP_LABELS: Record<PullRequestGroupKey, string> = {
-  reviewRequested: "Review requested",
-  authored: "Authored",
-  others: "Others",
+  reviewRequested: t("Review requested"),
+  authored: t("Authored"),
+  others: t("Others"),
 };
 
 function normalize(value: string | null | undefined): string | null {

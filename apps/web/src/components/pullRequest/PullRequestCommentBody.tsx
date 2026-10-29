@@ -1,3 +1,4 @@
+import { t } from "~/i18n";
 import { useId, useRef, useState, type ComponentProps } from "react";
 
 import { cn } from "~/lib/utils";
@@ -51,7 +52,7 @@ export function PullRequestCommentBody({
             setExpanded(!expanded);
           }}
         >
-          {expanded ? "Show less" : "Show full comment"}
+          {expanded ? t("Show less") : t("Show full comment")}
         </Button>
       ) : null}
     </div>

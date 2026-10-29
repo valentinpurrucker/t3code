@@ -10,6 +10,7 @@ import { ArrowUpRightIcon } from "lucide-react";
 import { useState } from "react";
 
 import { useRenderedAppearance } from "~/hooks/useTheme";
+import { t } from "~/i18n";
 import {
   getRenderablePatch,
   resolveDiffThemeName,
@@ -165,16 +166,19 @@ export function GuideExcerpt({
         />
       ) : loading ? (
         <p className="rounded-lg border border-border/60 px-3 py-2 text-xs text-muted-foreground">
-          Loading {excerpt.path}...
+          {t("Loading {path}...", { path: excerpt.path })}
         </p>
       ) : (
         <div className="flex items-center justify-between gap-3 rounded-lg border border-border/60 px-3 py-2 text-xs text-muted-foreground">
           <span className="min-w-0 truncate">
-            <span className="font-mono text-foreground">{excerpt.path}</span> lines {excerpt.start}-
-            {excerpt.end} are not in the loaded diff.
+            <span className="font-mono text-foreground">{excerpt.path}</span>{" "}
+            {t("lines {start}-{end} are not in the loaded diff.", {
+              start: excerpt.start,
+              end: excerpt.end,
+            })}
           </span>
           <Button size="xs" variant="outline" onClick={() => onOpenFile(excerpt.path)}>
-            Open in Code
+            {t("Open in Code")}
           </Button>
         </div>
       )}
@@ -324,13 +328,15 @@ function ExcerptDiff({
                 rangeLabel={`${excerpt.path}:${getReviewPositionAnchor(draft.position).line}`}
                 text=""
                 placeholder={
-                  commenting.canComment ? "Add a comment…" : "Ask the agent about these lines…"
+                  commenting.canComment
+                    ? t("Add a comment…")
+                    : t("Ask the agent about these lines…")
                 }
-                submitLabel={commenting.canComment ? "Add to review" : "Ask agent"}
+                submitLabel={commenting.canComment ? t("Add to review") : t("Ask agent")}
                 {...(commenting.canComment && onAskAgent !== null
                   ? {
                       secondaryAction: {
-                        label: "Ask agent",
+                        label: t("Ask agent"),
                         onAction: (text: string) => askAgent(text),
                       },
                     }
@@ -357,13 +363,20 @@ function ExcerptDiff({
         renderHeaderMetadata={() => (
           <span className="flex items-center gap-2 text-xs text-muted-foreground">
             <span className="tabular-nums">
-              {excerpt.side === "old" ? "removed code, " : ""}showing {slice.shown} of {slice.total}{" "}
-              diff lines
+              {excerpt.side === "old"
+                ? t("removed code, showing {shown} of {total} diff lines", {
+                    shown: slice.shown,
+                    total: slice.total,
+                  })
+                : t("showing {shown} of {total} diff lines", {
+                    shown: slice.shown,
+                    total: slice.total,
+                  })}
             </span>
             <Button
               size="icon-xs"
               variant="ghost-muted"
-              aria-label={`Open ${excerpt.path} in Code`}
+              aria-label={t("Open {path} in Code", { path: excerpt.path })}
               onClick={() => onOpenFile(excerpt.path)}
             >
               <ArrowUpRightIcon aria-hidden />

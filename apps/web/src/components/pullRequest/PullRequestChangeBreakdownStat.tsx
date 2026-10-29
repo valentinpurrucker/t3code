@@ -1,3 +1,4 @@
+import { t } from "~/i18n";
 import { formatDiffCount } from "@t3tools/client-runtime/diff-count";
 import type { EnvironmentId, PullRequestChangeBreakdown, PullRequestRef } from "@t3tools/contracts";
 import { useState } from "react";
@@ -9,11 +10,11 @@ import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { PullRequestDiffStat } from "./pullRequestPresentation";
 
 const KIND_LABELS = {
-  code: "Code",
-  tests: "Tests",
-  mocks: "Mocks",
-  generated: "Generated",
-  docs: "Docs",
+  code: t("Code"),
+  tests: t("Tests"),
+  mocks: t("Mocks"),
+  generated: t("Generated"),
+  docs: t("Docs"),
 } satisfies Record<keyof NonNullable<PullRequestChangeBreakdown>, string>;
 
 type DiffTotals = { additions: number; deletions: number };
@@ -64,7 +65,7 @@ export function PullRequestChangeBreakdownStat({
           <ChangeBreakdownGrid breakdown={breakdown} total={{ additions, deletions }} />
         </TooltipPopup>
       ) : query.isPending ? (
-        <TooltipPopup side="bottom">Loading breakdown</TooltipPopup>
+        <TooltipPopup side="bottom">{t("Loading breakdown")}</TooltipPopup>
       ) : null}
     </Tooltip>
   );
@@ -117,7 +118,11 @@ function ChangeBreakdownGrid({
       {total ? (
         <>
           <div className="col-span-3 border-t border-border" />
-          <BreakdownRow label="Total" additions={total.additions} deletions={total.deletions} />
+          <BreakdownRow
+            label={t("Total")}
+            additions={total.additions}
+            deletions={total.deletions}
+          />
         </>
       ) : null}
     </div>

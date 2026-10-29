@@ -1,3 +1,4 @@
+import { t } from "~/i18n";
 import { sourceControlClients } from "@t3tools/client-runtime/source-control-clients";
 import { useAtomCommand } from "~/state/use-atom-command";
 import type { EnvironmentId, PullRequestDetailView, PullRequestRef } from "@t3tools/contracts";
@@ -74,7 +75,7 @@ export function PullRequestCommentForm({
     });
     if (result._tag === "Failure") {
       setSubmitting(null);
-      toastManager.add({ type: "error", title: "Could not post the comment" });
+      toastManager.add({ type: "error", title: t("Could not post the comment") });
       return;
     }
     setBody("");
@@ -91,8 +92,10 @@ export function PullRequestCommentForm({
         disabled={submitting !== null || actionPending}
         value={body}
         rows={3}
-        placeholder="Leave a comment"
-        aria-label={`Comment on this ${sourceControlClients.get(detail.provider).changeRequest.singular}`}
+        placeholder={t("Leave a comment")}
+        aria-label={t("Comment on this {term}", {
+          term: sourceControlClients.get(detail.provider).changeRequest.singular,
+        })}
         onChange={(event) => setBody(event.target.value)}
         onKeyDown={(event) => {
           if (event.nativeEvent.isComposing || event.keyCode === 229) return;
@@ -127,20 +130,20 @@ export function PullRequestCommentForm({
               // The longest label holds the width, so the confirming click lands on the button.
               <span className="inline-grid">
                 <span aria-hidden className="invisible col-start-1 row-start-1">
-                  Close with comment
+                  {t("Close with comment")}
                 </span>
                 <span className="col-start-1 row-start-1">
                   {submitting === "close"
-                    ? "Closing..."
+                    ? t("Closing…")
                     : inlineConfirm.isArmed("close")
-                      ? "Confirm close?"
-                      : "Close with comment"}
+                      ? t("Confirm close?")
+                      : t("Close with comment")}
                 </span>
               </span>
             ) : submitting === "reopen" ? (
-              "Reopening..."
+              t("Reopening…")
             ) : (
-              "Reopen with comment"
+              t("Reopen with comment")
             )}
           </Button>
         )}
@@ -151,7 +154,7 @@ export function PullRequestCommentForm({
           onClick={() => void submit("comment")}
         >
           <SendIcon className="size-3.5" />
-          {submitting === "comment" ? "Posting..." : "Comment"}
+          {submitting === "comment" ? t("Posting…") : t("Comment")}
         </Button>
       </div>
     </div>
