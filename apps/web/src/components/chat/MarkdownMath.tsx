@@ -1,6 +1,7 @@
 import { lazy, memo, Suspense } from "react";
 
 import { RenderErrorBoundary } from "../RenderErrorBoundary";
+import { t } from "~/i18n";
 
 const MathTypeset = lazy(() => import("./MathTypeset"));
 
@@ -31,8 +32,8 @@ export const MarkdownMath = memo(function MarkdownMath(props: {
         props.focusable === false
           ? undefined
           : props.display
-            ? "Display equation"
-            : "Inline equation"
+            ? t("Display equation")
+            : t("Inline equation")
       }
     >
       <span
@@ -42,8 +43,8 @@ export const MarkdownMath = memo(function MarkdownMath(props: {
           props.focusable === false
             ? undefined
             : props.display
-              ? "Scroll display equation"
-              : "Scroll inline equation"
+              ? t("Scroll display equation")
+              : t("Scroll inline equation")
         }
       >
         <span className={props.display ? "inline-block w-max min-w-full" : "inline-block w-max"}>
