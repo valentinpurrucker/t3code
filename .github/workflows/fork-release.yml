@@ -85,6 +85,7 @@ jobs:
         run: |
           cd release-cli
           sha256sum -- * > SHA256SUMS
-          gh release create "v$VERSION" -- * \
+          gh release create "v$VERSION" \
             --target "$GITHUB_SHA" --latest --title "T3 Code $VERSION (self-sites fork)" \
-            --notes "Linux x64 build of the self-sites fork at $GITHUB_SHA. See FORK.md."
+            --notes "Linux x64 build of the self-sites fork at $GITHUB_SHA. See FORK.md." \
+            -- *
