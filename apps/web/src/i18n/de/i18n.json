@@ -1,0 +1,5 @@
+{
+  "System": "System",
+  "Language": "Sprache",
+  "Language of the interface. Changing it reloads the app.": "Sprache der Oberfläche. Beim Ändern wird die App neu geladen."
+}

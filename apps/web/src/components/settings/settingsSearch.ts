@@ -310,6 +310,13 @@ export const SETTINGS_SEARCH_ITEMS = [
     searchTerms: ["red green blue orange additions deletions changes counts palette colorblind"],
   },
   {
+    // Fork patch (self-sites): UI language.
+    id: "language",
+    title: "Language",
+    to: "/settings/appearance",
+    searchTerms: ["locale translation german deutsch english sprache"],
+  },
+  {
     id: "chat-width",
     title: "Chat width",
     to: "/settings/appearance",

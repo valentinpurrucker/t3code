@@ -30,6 +30,7 @@ import * as HttpEffect from "effect/http/HttpEffect";
 import { HttpServerRequest, HttpServerResponse } from "effect/http";
 import * as HttpApiBuilder from "effect/http-api/HttpApiBuilder";
 
+import * as CloudflareAccess from "./CloudflareAccess.ts";
 import * as EnvironmentAuth from "./EnvironmentAuth.ts";
 import * as SessionStore from "./SessionStore.ts";
 import { traceAuthenticatedRelayRequest, traceRelayRequest } from "../cloud/traceRelayRequest.ts";
@@ -263,6 +264,7 @@ export const layer = HttpApiBuilder.group(
   Effect.fnUntraced(function* (handlers) {
     const serverAuth = yield* EnvironmentAuth.EnvironmentAuth;
     const sessions = yield* SessionStore.SessionStore;
+    const cloudflareAccessSignIn = yield* CloudflareAccess.make;
 
     return handlers
       .handle(
@@ -272,6 +274,14 @@ export const layer = HttpApiBuilder.group(
             yield* annotateEnvironmentRequest(args.endpoint.name);
             const request = yield* HttpServerRequest.HttpServerRequest;
             const result = yield* serverAuth.getSessionState(request);
+            if (!result.authenticated && cloudflareAccessSignIn) {
+              const signedIn = yield* cloudflareAccessSignIn(request, result.auth);
+              if (signedIn) {
+                yield* appendSessionCookie(sessions.cookieName, signedIn.token, signedIn.expiresAt);
+                yield* appendCredentialResponseHeaders;
+                return signedIn.state;
+              }
+            }
             const credential = EnvironmentAuth.selectRequestCredential(
               request,
               sessions.cookieName,

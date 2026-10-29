@@ -22,6 +22,7 @@ import { useCustomThemes } from "../../hooks/useCustomThemes";
 import { useTheme } from "../../hooks/useTheme";
 import { useScopedSettings, useUpdateScopedSettings } from "./useScopedSettings";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
+import { getLocalePreference, LOCALE_OPTIONS, setLocalePreference, t } from "~/i18n";
 import { Switch } from "../ui/switch";
 import { ThemeLibrary } from "./ThemeSettings";
 import {
@@ -147,6 +148,35 @@ export function AppearanceSettingsPanel() {
       </SettingsSection>
 
       <SettingsSection id="appearance-interface" title="Interface">
+        <SettingsRow
+          {...searchableSetting("language")}
+          description={t("Language of the interface. Changing it reloads the app.")}
+          control={
+            <div className="w-full sm:w-40">
+              <Select
+                value={getLocalePreference()}
+                onValueChange={(value) => {
+                  const option = LOCALE_OPTIONS.find((candidate) => candidate.value === value);
+                  if (option) setLocalePreference(option.value);
+                }}
+              >
+                <SelectTrigger size="sm" className="w-full min-w-0" aria-label={t("Language")}>
+                  <SelectValue>
+                    {LOCALE_OPTIONS.find((option) => option.value === getLocalePreference())?.label}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectPopup align="end" alignItemWithTrigger={false}>
+                  {LOCALE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectPopup>
+              </Select>
+            </div>
+          }
+        />
+
         <SettingsRow
           {...searchableSetting("setting-appearance-contrast")}
           description="Adjust the contrast of colors and borders across the interface."

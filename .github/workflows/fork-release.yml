@@ -1,0 +1,90 @@
+# Fork (self-sites): build and publish the Linux x64 CLI archive only.
+# Every upstream workflow is disabled in this fork (gh workflow disable); this is the only one.
+# Versions are <server version>-selfsites.<date>.<run>, so they never collide with upstream ones
+# in ~/.t3/runtime/versions. See FORK.md.
+name: Fork Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fork-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            /*
+            !/.repos/
+          sparse-checkout-cone-mode: false
+
+      - name: Resolve version
+        id: version
+        run: |
+          base="$(jq -r .version apps/server/package.json)"
+          echo "version=${base%%-*}-selfsites.$(date -u +%Y%m%d).${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-ci-deps
+        with:
+          install-args: --filter=t3... --filter=@t3tools/web... --filter=@t3tools/scripts... --filter=./oxlint-plugin-t3code
+
+      - name: Typecheck
+        run: vp run --filter t3 --filter @t3tools/web typecheck
+
+      - name: Test fork patches
+        run: |
+          (cd apps/server && vp test run src/auth src/cli/update.test.ts)
+          (cd scripts && vp test run install.test.ts)
+
+      # The public T3 Connect identifiers that official builds bake in, so T3 Connect keeps working.
+      - name: Enable T3 Connect
+        run: cp .env.example .env
+
+      - name: Align package versions
+        run: node scripts/update-release-package-versions.ts "${{ steps.version.outputs.version }}"
+
+      - name: Build server and web client
+        run: vp run --filter t3 build
+
+      - name: Apply web client branding
+        run: node scripts/apply-web-brand-assets.ts production apps/server/dist/client
+
+      - name: Build resource monitor
+        run: |
+          cargo build --locked --release --manifest-path native/resource-monitor/Cargo.toml --target x86_64-unknown-linux-gnu
+          mkdir -p "$RUNNER_TEMP/cli-resource-monitor/linux-x64"
+          cp native/resource-monitor/target/x86_64-unknown-linux-gnu/release/t3-resource-monitor "$RUNNER_TEMP/cli-resource-monitor/linux-x64/"
+
+      - name: Build CLI single-executable
+        run: node apps/server/scripts/cli.ts build-exe --verbose
+
+      - name: Build CLI archive
+        run: |
+          node scripts/build-cli-archive.ts --platform linux --arch x64 \
+            --version "${{ steps.version.outputs.version }}" \
+            --resource-monitor-dir "$RUNNER_TEMP/cli-resource-monitor" \
+            --output-dir release-cli
+
+      - name: Smoke-test CLI archive
+        run: node scripts/smoke-cli-archive.ts --archive release-cli/* --expect-version "${{ steps.version.outputs.version }}"
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          cd release-cli
+          sha256sum -- * > SHA256SUMS
+          gh release create "v$VERSION" -- * \
+            --target "$GITHUB_SHA" --latest --title "T3 Code $VERSION (self-sites fork)" \
+            --notes "Linux x64 build of the self-sites fork at $GITHUB_SHA. See FORK.md."
