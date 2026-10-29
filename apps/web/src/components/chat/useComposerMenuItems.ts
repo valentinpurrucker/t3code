@@ -47,6 +47,7 @@ import {
   searchSlashCommandItems,
   slashCommandItemsForPromptPosition,
 } from "./composerSlashCommandSearch";
+import { t } from "~/i18n";
 
 const COMPOSER_PULL_REQUEST_LIST_LIMIT = 99;
 const COMPOSER_PULL_REQUEST_RESULT_LIMIT = 12;
@@ -216,7 +217,7 @@ export function useComposerMenuItems({
           type: "slash-command",
           command: "model",
           label: "/model",
-          description: "Switch response model for this thread",
+          description: t("Switch response model for this thread"),
         },
         ...(planModeUiEnabled
           ? ([
@@ -225,14 +226,14 @@ export function useComposerMenuItems({
                 type: "slash-command",
                 command: "plan",
                 label: "/plan",
-                description: "Switch this thread into plan mode",
+                description: t("Switch this thread into plan mode"),
               },
               {
                 id: "slash:default",
                 type: "slash-command",
                 command: "default",
                 label: "/default",
-                description: "Switch this thread back to normal build mode",
+                description: t("Switch this thread back to normal build mode"),
               },
             ] as const)
           : []),
@@ -250,7 +251,7 @@ export function useComposerMenuItems({
         provider: selectedProvider,
         command,
         label: `/${command.name}`,
-        description: command.description ?? command.input?.hint ?? "Run provider command",
+        description: command.description ?? command.input?.hint ?? t("Run provider command"),
       }));
       const query = composerTrigger.query.trim().toLowerCase();
       const skillItems = slashMenuSkills.map((skill) => ({
@@ -262,7 +263,7 @@ export function useComposerMenuItems({
         description:
           skill.shortDescription ??
           skill.description ??
-          (skill.scope ? `${skill.scope} skill` : ""),
+          (skill.scope ? t("{scope} skill", { scope: skill.scope }) : ""),
       }));
       const visibleProviderSlashCommandItems = providerSlashCommandItems.filter(
         (item) => item.command.name !== "compact" || compactSlashCommandAvailable,
@@ -283,7 +284,7 @@ export function useComposerMenuItems({
         description:
           skill.shortDescription ??
           skill.description ??
-          (skill.scope ? `${skill.scope} skill` : "Run provider skill"),
+          (skill.scope ? t("{scope} skill", { scope: skill.scope }) : t("Run provider skill")),
       }));
     }
     if (
@@ -360,25 +361,25 @@ export function useComposerMenuItems({
         exactPullRequestLookup.isPending));
   const emptyState = (() => {
     if (composerTriggerKind === "skill") {
-      return "No skills found. Try / to browse provider commands.";
+      return t("No skills found. Try / to browse provider commands.");
     }
     if (composerTriggerKind === "pull-request") {
       if (pullRequestProjectId === null || pullRequestRepository === null) {
-        return "Pull requests are not available for this project.";
+        return t("Pull requests are not available for this project.");
       }
       if (
         pullRequestLookup.error !== null ||
         pullRequestLookup.data?.errors.some((error) => error.projectId === pullRequestProjectId)
       ) {
-        return "Pull requests could not be read for this project.";
+        return t("Pull requests could not be read for this project.");
       }
       return composerTrigger?.query
-        ? `No pull request matches ${composerTrigger.query}.`
-        : "No pull requests found in this repository.";
+        ? t("No pull request matches {query}.", { query: composerTrigger.query })
+        : t("No pull requests found in this repository.");
     }
     return composerTriggerKind === "path"
-      ? "No matching files or folders."
-      : "No matching command.";
+      ? t("No matching files or folders.")
+      : t("No matching command.");
   })();
 
   return { items, isLoading, emptyState };
