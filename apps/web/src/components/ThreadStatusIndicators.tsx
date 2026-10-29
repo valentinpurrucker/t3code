@@ -619,6 +619,18 @@ export function ThreadWorktreeIndicator({
   );
 }
 
+const THREAD_STATUS_LABELS: Record<ThreadStatusPill["label"], string> = {
+  Working: t("Working"),
+  Connecting: t("Connecting"),
+  Completed: t("Completed"),
+  Failed: t("Failed"),
+  "Pending Approval": t("Pending Approval"),
+  "Awaiting Input": t("Awaiting Input"),
+  "Guest Request": t("Guest Request"),
+  Waiting: t("Waiting"),
+  "Plan Ready": t("Plan Ready"),
+};
+
 function ThreadStatusLabel({
   status,
   compact = false,
@@ -633,7 +645,7 @@ function ThreadStatusLabel({
           render={
             <span
               role="img"
-              aria-label={status.label}
+              aria-label={THREAD_STATUS_LABELS[status.label]}
               className={`inline-flex size-3.5 shrink-0 items-center justify-center ${status.colorClass}`}
             />
           }
@@ -644,7 +656,7 @@ function ThreadStatusLabel({
             }`}
           />
         </TooltipTrigger>
-        <TooltipPopup side="top">{status.label}</TooltipPopup>
+        <TooltipPopup side="top">{THREAD_STATUS_LABELS[status.label]}</TooltipPopup>
       </Tooltip>
     );
   }
@@ -655,7 +667,7 @@ function ThreadStatusLabel({
         render={
           <span
             role="img"
-            aria-label={status.label}
+            aria-label={THREAD_STATUS_LABELS[status.label]}
             className={`inline-flex items-center gap-1 text-3xs ${status.colorClass}`}
           />
         }
@@ -665,9 +677,9 @@ function ThreadStatusLabel({
             status.pulse ? "motion-safe:animate-status-pulse" : ""
           }`}
         />
-        <span className="hidden md:inline">{status.label}</span>
+        <span className="hidden md:inline">{THREAD_STATUS_LABELS[status.label]}</span>
       </TooltipTrigger>
-      <TooltipPopup side="top">{status.label}</TooltipPopup>
+      <TooltipPopup side="top">{THREAD_STATUS_LABELS[status.label]}</TooltipPopup>
     </Tooltip>
   );
 }

@@ -8,6 +8,8 @@ import {
 } from "@t3tools/contracts";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 
+import { t } from "~/i18n";
+
 import {
   type DraftId,
   type PersistedComposerImageAttachment,
@@ -164,7 +166,7 @@ export async function deliverSnapShot(
   const compressed = await compressImageToByteLimit(original, PROVIDER_SEND_TURN_MAX_IMAGE_BYTES);
   if (!compressed.ok) {
     finishSnapShotAnimation(item.id);
-    throw new Error("The captured window is too large to attach.");
+    throw new Error(t("The captured window is too large to attach."));
   }
   const file = compressed.file;
   const source = resizeSnapShotSource(capture.source, compressed.imageSize);
@@ -191,7 +193,7 @@ export async function deliverSnapShot(
         ? store.addImage(target, image)
         : questionAttachmentCount < PROVIDER_SEND_TURN_MAX_ATTACHMENTS &&
           store.addImages(target, [image]).includes(capture.id);
-    if (!added) throw new Error("Remove an attachment, then try this capture again.");
+    if (!added) throw new Error(t("Remove an attachment, then try this capture again."));
   }
   const persisted: PersistedComposerImageAttachment = {
     id: capture.id,
@@ -207,7 +209,7 @@ export async function deliverSnapShot(
       ?.persistedAttachments.filter((attachment) => attachment.id !== capture.id) ?? [];
   await store.syncPersistedAttachments(target, [...persistedAttachments, persisted]);
   if (!store.getComposerDraft(target)?.persistedAttachments.some(({ id }) => id === capture.id)) {
-    throw new Error("The captured window could not be saved to the draft.");
+    throw new Error(t("The captured window could not be saved to the draft."));
   }
 
   // Paint the attachment before removing the capture overlay to avoid missing frames at landing.
@@ -347,8 +349,8 @@ export function SnapShotCoordinator() {
               "missing-project",
               stackedThreadToast({
                 type: "error",
-                title: "Snapshot taken, but no project is available",
-                description: "Add a project, then capture the window again.",
+                title: t("Snapshot taken, but no project is available"),
+                description: t("Add a project, then capture the window again."),
               }),
             );
             continue;
@@ -371,10 +373,11 @@ export function SnapShotCoordinator() {
               "delivery",
               stackedThreadToast({
                 type: "error",
-                title: "Snapshot failed",
-                description: `Capture ${item.id}: ${
-                  error instanceof Error ? error.message : "Try the capture again."
-                }`,
+                title: t("Snapshot failed"),
+                description: t("Capture {id}: {error}", {
+                  id: item.id,
+                  error: error instanceof Error ? error.message : t("Try the capture again."),
+                }),
               }),
             );
           }
@@ -387,8 +390,8 @@ export function SnapShotCoordinator() {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Snapshot failed",
-            description: error instanceof Error ? error.message : "Try the capture again.",
+            title: t("Snapshot failed"),
+            description: error instanceof Error ? error.message : t("Try the capture again."),
           }),
         );
       })
@@ -455,8 +458,8 @@ export function SnapShotCoordinator() {
             toastManager.add(
               stackedThreadToast({
                 type: "error",
-                title: "Snapshot failed",
-                description: state.message ?? "Try the capture again.",
+                title: t("Snapshot failed"),
+                description: state.message ?? t("Try the capture again."),
               }),
             );
           });

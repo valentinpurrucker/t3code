@@ -64,7 +64,7 @@ import {
   type ProviderInstanceEntry,
 } from "../../providerInstances";
 import { providerModelKey, sortProviderModelItems } from "../../modelOrdering";
-import { t } from "~/i18n";
+import { t, tn } from "~/i18n";
 
 type ModelPickerItem = {
   slug: string;
@@ -981,9 +981,9 @@ export const ModelPickerContent = memo(function ModelPickerContent(props: {
                       className="group w-full cursor-pointer"
                     >
                       <div className="min-w-0 flex-1 text-left">
-                        <div className="text-sm font-normal leading-snug">Legacy models</div>
+                        <div className="text-sm font-normal leading-snug">{t("Legacy models")}</div>
                         <div className="mt-1 text-xs font-normal leading-snug text-muted-foreground">
-                          {legacySection.legacyModels.length} models
+                          {tn(legacySection.legacyModels.length, "{count} model", "{count} models")}
                         </div>
                       </div>
                       <ChevronRightIcon

@@ -155,7 +155,7 @@ export function BranchRestoreConfirmHost(props: {
       <AlertDialogPopup>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Switch to <code className="font-medium">{props.threadBranch}</code>?
+            {t("Switch to {branch}?", { branch: props.threadBranch })}
           </AlertDialogTitle>
           <AlertDialogDescription>
             {t(

@@ -1,0 +1,16 @@
+{
+  "Add a project, then capture the window again.": "Füge ein Projekt hinzu und nimm das Fenster dann erneut auf.",
+  "Add the backend at {origin}?": "Backend unter {origin} hinzufügen?",
+  "Backend added": "Backend hinzugefügt",
+  "Capture {id}: {error}": "Aufnahme {id}: {error}",
+  "Could not add backend": "Backend konnte nicht hinzugefügt werden",
+  "Could not open the link": "Der Link konnte nicht geöffnet werden",
+  "Failed to add backend.": "Das Backend konnte nicht hinzugefügt werden.",
+  "Remove an attachment, then try this capture again.": "Entferne einen Anhang und versuche die Aufnahme dann erneut.",
+  "Snapshot failed": "Screenshot fehlgeschlagen",
+  "Snapshot taken, but no project is available": "Screenshot aufgenommen, aber kein Projekt verfügbar",
+  "The captured window could not be saved to the draft.": "Das aufgenommene Fenster konnte nicht im Entwurf gespeichert werden.",
+  "The captured window is too large to attach.": "Das aufgenommene Fenster ist zu groß für einen Anhang.",
+  "The environment is saved and will reconnect on app startup.": "Die Umgebung ist gespeichert und verbindet sich beim App-Start erneut.",
+  "Try the capture again.": "Versuche die Aufnahme erneut."
+}

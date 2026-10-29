@@ -1657,7 +1657,7 @@ export function WorkspaceLargeTextPreview(props: {
           <DownloadIcon className="size-3.5" />
         </FileSurfaceAction>
       </div>
-      <Suspense fallback={<div className="p-6 text-xs text-muted-foreground">Loading…</div>}>
+      <Suspense fallback={<div className="p-6 text-xs text-muted-foreground">{t("Loading…")}</div>}>
         <LargeTextViewer
           key={`${src}:${revision}`}
           name={props.name}

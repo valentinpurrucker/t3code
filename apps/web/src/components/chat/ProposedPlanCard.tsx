@@ -282,7 +282,9 @@ function SavePlanToWorkspaceForm({
       <DialogHeader>
         <DialogTitle>{t("Save plan to workspace")}</DialogTitle>
         <DialogDescription>
-          Enter a path relative to <code>{workspaceRoot ?? t("the workspace")}</code>.
+          {t("Enter a path relative to {path}.", {
+            path: workspaceRoot ?? t("the workspace"),
+          })}
         </DialogDescription>
       </DialogHeader>
       <DialogPanel>
