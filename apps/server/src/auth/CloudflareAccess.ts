@@ -59,18 +59,18 @@ const readConfig = Effect.gen(function* () {
   } satisfies CloudflareAccessConfig;
 }).pipe(Effect.orElseSucceed(() => undefined));
 
-/** Resolves the request's verified Cloudflare Access email, or undefined. Never fails. */
+/** The request's verified Cloudflare Access email, if any. Never fails. */
 export function makeVerifier(
   config: CloudflareAccessConfig,
   keys: JWTVerifyGetKey = createRemoteJWKSet(new URL(`${config.issuer}/cdn-cgi/access/certs`)),
 ) {
-  return (request: HttpServerRequest.HttpServerRequest): Effect.Effect<string | undefined> => {
+  return (request: HttpServerRequest.HttpServerRequest): Effect.Effect<Option.Option<string>> => {
     const token = request.headers[JWT_HEADER];
-    if (typeof token !== "string" || token === "") return Effect.succeed(undefined);
+    if (typeof token !== "string" || token === "") return Effect.succeedNone;
     // A cross-site page must not mint sessions, even into the owner's own browser.
     const site = request.headers["sec-fetch-site"];
     if (site !== undefined && site !== "same-origin" && site !== "none") {
-      return Effect.succeed(undefined);
+      return Effect.succeedNone;
     }
     return Effect.tryPromise(() =>
       jwtVerify(token, keys, {
@@ -82,17 +82,17 @@ export function makeVerifier(
       Effect.flatMap(({ payload }) => {
         // Service tokens carry no email; only people sign in this way.
         const email = typeof payload.email === "string" ? payload.email.toLowerCase() : "";
-        if (email === "") return Effect.succeed(undefined);
+        if (email === "") return Effect.succeedNone;
         if (config.emails.size > 0 && !config.emails.has(email)) {
           return Effect.logWarning("Rejected a Cloudflare Access email outside the allowlist.", {
             email,
-          }).pipe(Effect.as(undefined));
+          }).pipe(Effect.as(Option.none()));
         }
-        return Effect.succeed(email);
+        return Effect.succeedSome(email);
       }),
       Effect.catch((cause) =>
         Effect.logWarning("Rejected a Cloudflare Access token.", { reason: String(cause) }).pipe(
-          Effect.as(undefined),
+          Effect.as(Option.none<string>()),
         ),
       ),
     );
@@ -114,8 +114,9 @@ export const make = Effect.gen(function* () {
     request: HttpServerRequest.HttpServerRequest,
     auth: ServerAuthDescriptor,
   ) {
-    const email = yield* verify(request);
-    if (email === undefined) return undefined;
+    const verified = yield* verify(request);
+    if (Option.isNone(verified)) return undefined;
+    const email = verified.value;
     const session = yield* sessions
       .issue({
         method: "browser-session-cookie",

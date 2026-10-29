@@ -1,5 +1,6 @@
 import { expect, it } from "@effect/vitest";
 import * as Effect from "effect/Effect";
+import * as Option from "effect/Option";
 import type * as HttpServerRequest from "effect/http/HttpServerRequest";
 import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT } from "jose";
 
@@ -16,7 +17,7 @@ const setup = Effect.promise(async () => {
   });
   const sign = (
     claims: Record<string, unknown>,
-    options: { iss?: string; aud?: string; key?: CryptoKey } = {},
+    options: { iss?: string; aud?: string; key?: typeof privateKey } = {},
   ) =>
     new SignJWT(claims)
       .setProtectedHeader({ alg: "RS256", kid: "k1" })
@@ -30,6 +31,8 @@ const setup = Effect.promise(async () => {
 
 const request = (headers: Record<string, string>) =>
   ({ headers }) as unknown as HttpServerRequest.HttpServerRequest;
+const emailOf = (verified: Effect.Effect<Option.Option<string>>) =>
+  verified.pipe(Effect.map(Option.getOrUndefined));
 
 it.effect("accepts only Cloudflare-signed tokens for this app and allowed emails", () =>
   Effect.gen(function* () {
@@ -38,14 +41,16 @@ it.effect("accepts only Cloudflare-signed tokens for this app and allowed emails
     const token = (claims: Record<string, unknown>, options?: Parameters<typeof sign>[1]) =>
       Effect.promise(() => sign(claims, options));
     const verifyWith = (jwt: string, headers: Record<string, string> = {}) =>
-      verify(request({ "cf-access-jwt-assertion": jwt, ...headers }));
+      emailOf(verify(request({ "cf-access-jwt-assertion": jwt, ...headers })));
 
     expect(yield* verifyWith(yield* token({ email: "Alice@example.com" }))).toBe(
       "alice@example.com",
     );
     // The forgeable email header alone never signs anyone in.
     expect(
-      yield* verify(request({ "cf-access-authenticated-user-email": "alice@example.com" })),
+      yield* emailOf(
+        verify(request({ "cf-access-authenticated-user-email": "alice@example.com" })),
+      ),
     ).toBeUndefined();
     expect(yield* verifyWith(yield* token({ email: "mallory@example.com" }))).toBeUndefined();
     expect(
@@ -75,6 +80,8 @@ it.effect("accepts any Cloudflare Access email when no allowlist is set", () =>
     const { keys, sign } = yield* setup;
     const verify = makeVerifier({ issuer, audience, emails: new Set() }, keys);
     const jwt = yield* Effect.promise(() => sign({ email: "bob@example.com" }));
-    expect(yield* verify(request({ "cf-access-jwt-assertion": jwt }))).toBe("bob@example.com");
+    expect(yield* emailOf(verify(request({ "cf-access-jwt-assertion": jwt })))).toBe(
+      "bob@example.com",
+    );
   }),
 );
