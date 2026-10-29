@@ -1,4 +1,5 @@
 import type { ChatComposerProps } from "./ChatComposer";
+import { t } from "~/i18n";
 import type { PromptUltrathink } from "./TraitsPicker";
 import type { ProviderInstanceEntry } from "../../providerInstances";
 import { type AppModelOption } from "../../modelSelection";
@@ -178,10 +179,11 @@ export function ComposerControlsBar(props: {
     ...(permissionsChipHidden
       ? {
           extraMenuHint: [
-            `Permissions: ${
-              compatibleRuntimeModeOptions.find((option) => option.mode === compatibleRuntimeMode)
-                ?.label ?? compatibleRuntimeMode
-            }`,
+            t("Permissions: {mode}", {
+              mode:
+                compatibleRuntimeModeOptions.find((option) => option.mode === compatibleRuntimeMode)
+                  ?.label ?? compatibleRuntimeMode,
+            }),
             shortcutLabelForCommand(keybindings, "composer.mode"),
           ]
             .filter(Boolean)
@@ -303,7 +305,7 @@ export function ComposerControlsBar(props: {
       className="shrink-0"
     >
       <CircleAlertIcon className="size-4" />
-      {providerSetupInstanceId ? "Open provider settings" : "No provider available"}
+      {providerSetupInstanceId ? t("Open provider settings") : t("No provider available")}
     </ComposerControl>
   ) : (
     <>

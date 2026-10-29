@@ -1,4 +1,5 @@
 import { InfoIcon } from "lucide-react";
+import { t } from "~/i18n";
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
 import { Button } from "../ui/button";
@@ -110,7 +111,7 @@ export function NoticeText({
             <InfoIcon />
           </PopoverTrigger>
           <PopoverPopup
-            aria-label="Notice details"
+            aria-label={t("Notice details")}
             tooltipStyle
             side="top"
             className="max-w-[min(30rem,calc(100vw-2rem))] whitespace-normal wrap-anywhere [--inline-button-text-align:start] [--inline-button-white-space:normal] [&_[data-slot=inline-button]]:max-w-full"
@@ -141,8 +142,8 @@ function NoticeCard({ item }: { readonly item: ComposerBannerStackItem }) {
           <NoticeText
             detailsLabel={
               typeof item.title === "string"
-                ? `Show full title: ${item.title}`
-                : "Show title details"
+                ? t("Show full title: {title}", { title: item.title })
+                : t("Show title details")
             }
             className="min-w-0 truncate font-medium leading-7 sm:leading-6"
           >
@@ -152,8 +153,8 @@ function NoticeCard({ item }: { readonly item: ComposerBannerStackItem }) {
             <NoticeText
               detailsLabel={
                 typeof item.title === "string"
-                  ? `Show details: ${item.title}`
-                  : "Show notice details"
+                  ? t("Show details: {title}", { title: item.title })
+                  : t("Show notice details")
               }
               className="w-0 min-w-0 grow truncate text-muted-foreground @max-[400px]:sr-only"
             >
@@ -166,7 +167,7 @@ function NoticeCard({ item }: { readonly item: ComposerBannerStackItem }) {
             {item.actions}
             {item.onDismiss ? (
               <ComposerBanner.Dismiss
-                aria-label={item.dismissLabel ?? "Dismiss warning"}
+                aria-label={item.dismissLabel ?? t("Dismiss warning")}
                 onClick={item.onDismiss}
               />
             ) : null}

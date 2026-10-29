@@ -8,6 +8,7 @@ import {
   resolveSelectableProviderInstanceEntry,
   type ProviderInstanceEntry,
 } from "../../providerInstances";
+import { locale, t } from "~/i18n";
 import { getDisplayModelName, type ModelEsque } from "./providerIconUtils";
 
 // Fallback TTL: Claude's 1h cache plus slack.
@@ -104,11 +105,13 @@ export function formatContextWindowCompactionMessage(
   autoCompactThreshold?: number | null,
 ): string {
   if (typeof autoCompactThreshold === "number" && autoCompactThreshold > 0) {
-    return `Compacts automatically at about ${autoCompactThreshold.toLocaleString("en-US")} tokens.`;
+    return t("Compacts automatically at about {tokens} tokens.", {
+      tokens: autoCompactThreshold.toLocaleString(locale),
+    });
   }
   return modelDisplayName
-    ? `Context for ${modelDisplayName} compacts automatically when needed.`
-    : "Context compacts automatically when needed.";
+    ? t("Context for {model} compacts automatically when needed.", { model: modelDisplayName })
+    : t("Context compacts automatically when needed.");
 }
 
 export function shouldReserveContextWindowMeter(input: {
