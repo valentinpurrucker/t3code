@@ -4,7 +4,8 @@
 
 export type Locale = "en" | "de";
 export type LocalePreference = Locale | "system";
-type Params = Readonly<Record<string, string | number>>;
+// Like a template literal, minus "undefined"/"null": a missing value renders as nothing.
+type Params = Readonly<Record<string, string | number | null | undefined>>;
 
 const STORAGE_KEY = "t3code:locale";
 
@@ -54,7 +55,7 @@ export function setLocalePreference(next: LocalePreference): void {
 
 function interpolate(text: string, params: Params): string {
   return text.replace(/\{(\w+)\}/g, (match, name: string) =>
-    name in params ? String(params[name]) : match,
+    name in params ? String(params[name] ?? "") : match,
   );
 }
 
