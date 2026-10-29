@@ -448,5 +448,8 @@
   "{count} conversations": "{count} Unterhaltungen",
   "{term} #{number} files": "Dateien von {term} #{number}",
   "Load more files": "Weitere Dateien laden",
-  "{term} link": "{term}-Link"
+  "{term} link": "{term}-Link",
+  "Add to review": "Zum Review hinzufügen",
+  "Line {line}": "Zeile {line}",
+  "Wrap lines": "Zeilen umbrechen"
 }

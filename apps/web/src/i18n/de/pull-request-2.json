@@ -259,5 +259,7 @@
   "Checkout ready": "Checkout bereit",
   "The task is in the composer. Read it over, then send.": "Die Aufgabe ist im Eingabefeld. Lies sie durch und sende sie dann.",
   "Unable to update the thread pull request": "Thread-Pull-Request konnte nicht aktualisiert werden",
-  "Could not update viewed files": "Gesehene Dateien konnten nicht aktualisiert werden"
+  "Could not update viewed files": "Gesehene Dateien konnten nicht aktualisiert werden",
+  "Unlink from thread": "Verknüpfung mit Thread lösen",
+  "Fix": "Beheben"
 }
