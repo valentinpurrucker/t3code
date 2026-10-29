@@ -6,6 +6,11 @@ name: Fork Release
 
 on:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Build and publish a release (off = typecheck and tests only)
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -48,27 +53,34 @@ jobs:
 
       # The public T3 Connect identifiers that official builds bake in, so T3 Connect keeps working.
       - name: Enable T3 Connect
+        if: inputs.publish
         run: cp .env.example .env
 
       - name: Align package versions
+        if: inputs.publish
         run: node scripts/update-release-package-versions.ts "${{ steps.version.outputs.version }}"
 
       - name: Build server and web client
+        if: inputs.publish
         run: vp run --filter t3 build
 
       - name: Apply web client branding
+        if: inputs.publish
         run: node scripts/apply-web-brand-assets.ts production apps/server/dist/client
 
       - name: Build resource monitor
+        if: inputs.publish
         run: |
           cargo build --locked --release --manifest-path native/resource-monitor/Cargo.toml --target x86_64-unknown-linux-gnu
           mkdir -p "$RUNNER_TEMP/cli-resource-monitor/linux-x64"
           cp native/resource-monitor/target/x86_64-unknown-linux-gnu/release/t3-resource-monitor "$RUNNER_TEMP/cli-resource-monitor/linux-x64/"
 
       - name: Build CLI single-executable
+        if: inputs.publish
         run: node apps/server/scripts/cli.ts build-exe --verbose
 
       - name: Build CLI archive
+        if: inputs.publish
         run: |
           node scripts/build-cli-archive.ts --platform linux --arch x64 \
             --version "${{ steps.version.outputs.version }}" \
@@ -76,9 +88,11 @@ jobs:
             --output-dir release-cli
 
       - name: Smoke-test CLI archive
+        if: inputs.publish
         run: node scripts/smoke-cli-archive.ts --archive release-cli/* --expect-version "${{ steps.version.outputs.version }}"
 
       - name: Publish release
+        if: inputs.publish
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.version.outputs.version }}

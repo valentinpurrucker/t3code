@@ -60,6 +60,7 @@ runs:
 
 ```sh
 gh workflow run fork-release.yml -R valentinpurrucker/t3code --ref self-sites
+gh workflow run fork-release.yml -R valentinpurrucker/t3code --ref self-sites -f publish=false  # checks only
 ```
 
 It typechecks the server and web, runs the fork's tests, and builds and smoke-tests
