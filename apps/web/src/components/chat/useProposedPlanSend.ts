@@ -1,3 +1,4 @@
+import { t } from "~/i18n";
 import {
   AuthOrchestrationOperateScope,
   type EnvironmentId,
@@ -224,7 +225,7 @@ export function usePlanFollowUpSend(input: PlanFollowUpSendInput) {
       const error = squashAtomCommandFailure(failure);
       setThreadError(
         threadIdForSend,
-        error instanceof Error ? error.message : "Failed to send plan follow-up.",
+        error instanceof Error ? error.message : t("Failed to send plan follow-up."),
       );
     }
     sendInFlightRef.current = false;
@@ -382,11 +383,11 @@ export function useImplementPlanInNewThread(input: ImplementPlanInNewThreadInput
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not start implementation thread",
+            title: t("Could not start implementation thread"),
             description:
               error instanceof Error
                 ? error.message
-                : "An error occurred while creating the new thread.",
+                : t("An error occurred while creating the new thread."),
           }),
         );
       }

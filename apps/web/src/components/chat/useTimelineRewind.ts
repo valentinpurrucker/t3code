@@ -1,3 +1,4 @@
+import { t } from "~/i18n";
 import type { EnvironmentThreadShell, ThreadStructure } from "@t3tools/client-runtime/state/shell";
 import type { ComposerThreadTarget } from "../../composerDraftStore";
 import type { ComposerHandleRef } from "../../composerHandleContext";
@@ -109,19 +110,26 @@ export function useTimelineRewind(input: TimelineRewindInput) {
     if (!supportsConversationRollback) {
       setThreadError(
         activeThread.id,
-        "This provider does not support reverting conversation history. Start a new thread instead.",
+        t(
+          "This provider does not support reverting conversation history. Start a new thread instead.",
+        ),
       );
       return;
     }
     if (activeEnvironmentUnavailable && activeEnvironmentUnavailableLabel) {
       setThreadError(
         activeThread.id,
-        `Reconnect ${activeEnvironmentUnavailableLabel} before reverting checkpoints.`,
+        t("Reconnect {name} before reverting checkpoints.", {
+          name: activeEnvironmentUnavailableLabel,
+        }),
       );
       return;
     }
     if (phase === "running" || isSendBusy) {
-      setThreadError(activeThread.id, "Interrupt the current turn before reverting checkpoints.");
+      setThreadError(
+        activeThread.id,
+        t("Interrupt the current turn before reverting checkpoints."),
+      );
       return;
     }
     if (restoreFiles === undefined) {
@@ -192,7 +200,7 @@ export function useTimelineRewind(input: TimelineRewindInput) {
         const error = squashAtomCommandFailure(result);
         setThreadError(
           activeThread.id,
-          error instanceof Error ? error.message : "Failed to fork this response.",
+          error instanceof Error ? error.message : t("Failed to fork this response."),
         );
       }
       return;
@@ -201,7 +209,9 @@ export function useTimelineRewind(input: TimelineRewindInput) {
     if (!targetThreadReady) {
       setThreadError(
         activeThread.id,
-        "The fork was created, but its thread data did not reach this client. Reconnect and try opening it from the sidebar.",
+        t(
+          "The fork was created, but its thread data did not reach this client. Reconnect and try opening it from the sidebar.",
+        ),
       );
       return;
     }
