@@ -1,10 +1,11 @@
+import { t } from "~/i18n";
 import { useState, useSyncExternalStore } from "react";
 
 import { useStableCallback } from "~/hooks/useStableCallback";
 import { getDocumentActivity, subscribeDocumentActivity } from "~/lib/documentActivity";
 
 const POLL_INTERVAL_MS = 1500;
-const CHECK_FAILED_MESSAGE = "Could not check permissions. We'll try again automatically.";
+const CHECK_FAILED_MESSAGE = t("Could not check permissions. We'll try again automatically.");
 
 interface PermissionSnapshot<Id extends string> {
   readonly status: Record<Id, boolean>;

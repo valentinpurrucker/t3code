@@ -4,6 +4,7 @@ import { ChevronDownIcon, SquarePenIcon } from "lucide-react";
 import { memo } from "react";
 
 import { cn } from "~/lib/utils";
+import { t } from "~/i18n";
 import type { SidebarProjectSnapshot } from "../../sidebarProjectGrouping";
 import { useUiStateStore } from "../../uiStateStore";
 import { resolveSidebarFolderDot, resolveThreadLastVisitedAt } from "../Sidebar.logic";
@@ -18,10 +19,10 @@ const FOLDER_DOT_CLASS_NAME = {
 } as const;
 
 const FOLDER_DOT_LABEL = {
-  attention: ", needs you",
-  failed: ", failed",
-  unread: ", done",
-  working: ", working",
+  attention: t(", needs you"),
+  failed: t(", failed"),
+  unread: t(", done"),
+  working: t(", working"),
 } as const;
 
 /** The folder's sidebar tree row; its thread rows name it as their parent. */
@@ -104,7 +105,7 @@ export const SidebarProjectFolderHeader = memo(function SidebarProjectFolderHead
           data-sidebar-action-for={rowId}
           size="icon-xs"
           variant="ghost-muted"
-          aria-label={`New thread in ${group.displayName}`}
+          aria-label={t("New thread in {name}", { name: group.displayName })}
           onClick={() => props.onNewThread(group)}
         >
           <SquarePenIcon aria-hidden />
