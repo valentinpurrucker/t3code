@@ -1,3 +1,4 @@
+import { t } from "~/i18n";
 import {
   STATIC_KEYBINDING_COMMANDS,
   type KeybindingCommand,
@@ -102,11 +103,11 @@ export function whenAstToExpression(node: KeybindingWhenNode | undefined): strin
 }
 
 export function whenNodeRemoveLabel(node: KeybindingWhenNode, depth: number): string {
-  if (depth === 0) return "Clear all conditions";
+  if (depth === 0) return t("Clear all conditions");
   if (node.type === "identifier" || (node.type === "not" && node.node.type === "identifier")) {
-    return "Remove condition";
+    return t("Remove condition");
   }
-  return "Remove group and its conditions";
+  return t("Remove group and its conditions");
 }
 
 function wrapWhenExpression(node: KeybindingWhenNode): string {
@@ -124,7 +125,7 @@ export function parseWhenExpressionDraft(
   if (!ast) {
     return {
       ok: false,
-      message: "Use variables with !, &&, ||, and parentheses.",
+      message: t("Use variables with !, &&, ||, and parentheses."),
     };
   }
 
@@ -204,17 +205,17 @@ export interface KeybindingGroup {
 const KEYBINDING_GROUPS = [
   {
     id: "navigation",
-    title: "Navigation",
+    title: t("Navigation"),
     prefixes: ["sidebar", "rightPanel", "commandPalette", "filePicker", "projectSearch", "editor"],
   },
-  { id: "threads", title: "Threads", prefixes: ["thread", "chat", "pullRequest"] },
-  { id: "composer", title: "Composer", prefixes: ["composer", "modelPicker"] },
-  { id: "terminal", title: "Terminal", prefixes: ["terminal"] },
-  { id: "preview", title: "Preview & diff", prefixes: ["preview", "diff"] },
-  { id: "appearance", title: "Appearance", prefixes: ["theme", "appearance", "themeEditor"] },
-  { id: "scripts", title: "Project scripts", prefixes: ["script"] },
+  { id: "threads", title: t("Threads"), prefixes: ["thread", "chat", "pullRequest"] },
+  { id: "composer", title: t("Composer"), prefixes: ["composer", "modelPicker"] },
+  { id: "terminal", title: t("Terminal"), prefixes: ["terminal"] },
+  { id: "preview", title: t("Preview & diff"), prefixes: ["preview", "diff"] },
+  { id: "appearance", title: t("Appearance"), prefixes: ["theme", "appearance", "themeEditor"] },
+  { id: "scripts", title: t("Project scripts"), prefixes: ["script"] },
 ] as const;
-const OTHER_KEYBINDING_GROUP = { id: "other", title: "Other" } as const;
+const OTHER_KEYBINDING_GROUP = { id: "other", title: t("Other") } as const;
 
 function keybindingGroupFor(command: KeybindingCommand): { id: string; title: string } {
   const prefix = String(command).split(".")[0] ?? "";
@@ -357,23 +358,25 @@ export function buildKeybindingCommandOptions(
 }
 
 export function commandLabel(command: KeybindingCommand): string {
-  if (command === "workspace.focusNext") return "Focus Next Workspace Area";
-  if (command === "workspace.focusPrevious") return "Focus Previous Workspace Area";
-  if (command === "composer.sendAlternate") return "Composer: Opposite Queue or Steer Action";
-  if (command === "composer.sendBackground") return "Composer: Start in Background";
-  if (command === "composer.sendAndNewThread") return "Composer: Send and Start New Thread";
-  if (command === "thread.steerQueuedMessage") return "Queue: Send First Queued Message";
-  if (command === "thread.editQueuedMessage") return "Queue: Edit Last Queued Message";
-  if (command === "thread.copyReference") return "Pull Request: Copy Link or Thread";
+  if (command === "workspace.focusNext") return t("Focus Next Workspace Area");
+  if (command === "workspace.focusPrevious") return t("Focus Previous Workspace Area");
+  if (command === "composer.sendAlternate") return t("Composer: Opposite Queue or Steer Action");
+  if (command === "composer.sendBackground") return t("Composer: Start in Background");
+  if (command === "composer.sendAndNewThread") return t("Composer: Send and Start New Thread");
+  if (command === "thread.steerQueuedMessage") return t("Queue: Send First Queued Message");
+  if (command === "thread.editQueuedMessage") return t("Queue: Edit Last Queued Message");
+  if (command === "thread.copyReference") return t("Pull Request: Copy Link or Thread");
   const usageMetric = METRIC_OPTIONS.find((option) => option.command === command);
-  if (usageMetric) return `Usage: ${usageMetric.label}`;
+  if (usageMetric) return t("Usage: {label}", { label: usageMetric.label });
   const usagePeriod = WINDOW_OPTIONS.find((option) => option.command === command);
-  if (usagePeriod) return `Usage: Period: ${usagePeriod.label}`;
-  if (command === "view.reopenClosed") return "Reopen Closed Tab";
-  if (command === "preview.focusUrl") return "Preview: Focus URL";
+  if (usagePeriod) return t("Usage: Period: {label}", { label: usagePeriod.label });
+  if (command === "view.reopenClosed") return t("Reopen Closed Tab");
+  if (command === "preview.focusUrl") return t("Preview: Focus URL");
   const raw = String(command);
   if (raw.startsWith("script.") && raw.endsWith(".run")) {
-    return `Run Script: ${titleCaseCommandSegment(raw.slice("script.".length, -".run".length))}`;
+    return t("Run Script: {name}", {
+      name: titleCaseCommandSegment(raw.slice("script.".length, -".run".length)),
+    });
   }
   return raw.split(".").map(titleCaseCommandSegment).join(": ");
 }

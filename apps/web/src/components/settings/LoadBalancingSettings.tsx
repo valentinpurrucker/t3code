@@ -1,3 +1,4 @@
+import { t } from "~/i18n";
 import { resolveEnvironmentMachineKind } from "@t3tools/contracts";
 
 import {
@@ -13,10 +14,10 @@ import { FoldedSettingsSection } from "./FoldedSettingsSection";
 import { searchableSetting } from "./settingsSearch";
 
 const preferences = [
-  { value: 100, label: "Prefer" },
-  { value: 50, label: "Normal" },
-  { value: 25, label: "Less often" },
-  { value: 0, label: "Manual only" },
+  { value: 100, label: t("Prefer") },
+  { value: 50, label: t("Normal") },
+  { value: 25, label: t("Less often") },
+  { value: 0, label: t("Manual only") },
 ] as const;
 
 type LoadPreference = (typeof preferences)[number]["value"];
@@ -39,7 +40,12 @@ function summarizeLoadPreferences(
     const preference = loadPreferenceForWeight(weights[environment.environmentId]);
     return preference === 50
       ? []
-      : [`${environment.label} ${preferenceLabel(preference).toLowerCase()}`];
+      : [
+          t("{name} {preference}", {
+            name: environment.label,
+            preference: preferenceLabel(preference).toLowerCase(),
+          }),
+        ];
   });
   return parts.length === 0 ? null : parts.join(" · ");
 }
@@ -65,11 +71,11 @@ export function LoadBalancingSettings({
       summary={
         settings.loadBalancingEnabled
           ? summarizeLoadPreferences(environments, settings.loadBalancingWeights)
-          : "Off"
+          : t("Off")
       }
       control={
         <Switch
-          aria-label="Automatically balance load"
+          aria-label={t("Automatically balance load")}
           checked={settings.loadBalancingEnabled}
           disabled={!settingsHydrated}
           onCheckedChange={(loadBalancingEnabled) => updateClientSettings({ loadBalancingEnabled })}
@@ -77,8 +83,9 @@ export function LoadBalancingSettings({
       }
     >
       <p className="px-3 py-2.5 text-xs text-muted-foreground sm:px-4">
-        New threads in shared projects start on the machine with the most free CPU and memory,
-        weighted by each machine's preference.
+        {t(
+          "New threads in shared projects start on the machine with the most free CPU and memory, weighted by each machine's preference.",
+        )}
       </p>
       {environments.map((environment) => (
         <EnvironmentRow
@@ -106,7 +113,7 @@ export function LoadBalancingSettings({
             <SelectTrigger
               size="xs"
               className="w-32"
-              aria-label={`${environment.label} load preference`}
+              aria-label={t("{name} load preference", { name: environment.label })}
             >
               <SelectValue />
             </SelectTrigger>
