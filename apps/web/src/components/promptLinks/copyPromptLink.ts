@@ -14,6 +14,7 @@ import {
 import { type ComposerThreadTarget, useComposerDraftStore } from "~/composerDraftStore";
 import { writeTextToClipboard } from "~/hooks/useCopyToClipboard";
 import { configuredHostedAppUrl } from "~/hostedPairing";
+import { t } from "~/i18n";
 
 import { stackedThreadToast, toastManager } from "../ui/toast";
 
@@ -69,13 +70,13 @@ export function composerPromptLink(input: {
 export async function copyPromptLink(link: string): Promise<void> {
   try {
     if (!(await writeTextToClipboard(link))) return;
-    toastManager.add({ type: "success", title: "Prompt link copied" });
+    toastManager.add({ type: "success", title: t("Prompt link copied") });
   } catch (error) {
     toastManager.add(
       stackedThreadToast({
         type: "error",
-        title: "Could not copy the prompt link",
-        description: error instanceof Error ? error.message : "An error occurred.",
+        title: t("Could not copy the prompt link"),
+        description: error instanceof Error ? error.message : t("An error occurred."),
       }),
     );
   }

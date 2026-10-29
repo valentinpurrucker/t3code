@@ -26,6 +26,7 @@ import { useComposerDraftStore } from "~/composerDraftStore";
 import { isElectron } from "~/env";
 import { useNewThreadHandler } from "~/hooks/useHandleNewThread";
 import { useScratchProject } from "~/hooks/useScratchProject";
+import { t } from "~/i18n";
 import { newProjectId } from "~/lib/utils";
 import { useProjects, useThreadShells, waitForProject } from "~/state/entities";
 import { appAtomRegistry } from "~/rpc/atomRegistry";
@@ -137,7 +138,7 @@ export function NewThreadLinkView({ link }: { readonly link: NewThreadLink }) {
       replace: true,
     }).catch(() => null);
     if (opened === null) {
-      setState({ status: "failed", message: "T3 Code could not open a new thread." });
+      setState({ status: "failed", message: t("T3 Code could not open a new thread.") });
       return;
     }
     setState({ status: "opened" });
@@ -160,8 +161,14 @@ export function NewThreadLinkView({ link }: { readonly link: NewThreadLink }) {
       if (resolved === null || !resolved.exact) {
         notes.push(
           resolved === null
-            ? `The link asked for ${link.provider}, which is not set up here, so your default model is used.`
-            : `The link asked for ${link.model}, which ${link.provider} does not offer here, so its default model is used.`,
+            ? t(
+                "The link asked for {provider}, which is not set up here, so your default model is used.",
+                { provider: link.provider },
+              )
+            : t(
+                "The link asked for {model}, which {provider} does not offer here, so its default model is used.",
+                { model: link.model, provider: link.provider },
+              ),
         );
       }
     }
@@ -180,7 +187,7 @@ export function NewThreadLinkView({ link }: { readonly link: NewThreadLink }) {
     if (project === null) {
       setState({
         status: "failed",
-        message: "None of your machines can start a thread without a project right now.",
+        message: t("None of your machines can start a thread without a project right now."),
       });
       return;
     }
@@ -202,8 +209,9 @@ export function NewThreadLinkView({ link }: { readonly link: NewThreadLink }) {
     if (environmentId === null || newProjectsRoot === null) {
       setState({
         status: "failed",
-        message:
+        message: t(
           "This machine cannot clone from a link. Update T3 Code on it, or clone the repository from the command palette.",
+        ),
       });
       return;
     }
@@ -225,8 +233,8 @@ export function NewThreadLinkView({ link }: { readonly link: NewThreadLink }) {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Clone failed",
-            description: error instanceof Error ? error.message : "An error occurred.",
+            title: t("Clone failed"),
+            description: error instanceof Error ? error.message : t("An error occurred."),
           }),
         );
       }
@@ -241,14 +249,19 @@ export function NewThreadLinkView({ link }: { readonly link: NewThreadLink }) {
       () => null,
     );
     if (project === null) {
-      setState({ status: "failed", message: "The clone started, but its project did not appear." });
+      setState({
+        status: "failed",
+        message: t("The clone started, but its project did not appear."),
+      });
       return;
     }
     if (link.kind === "pull-request") {
       setState({
         status: "failed",
-        title: `Cloning ${repository.owner}/${repository.name}`,
-        message: "Open this link again when the clone finishes.",
+        title: t("Cloning {repository}", {
+          repository: `${repository.owner}/${repository.name}`,
+        }),
+        message: t("Open this link again when the clone finishes."),
       });
       return;
     }
@@ -334,10 +347,10 @@ export function NewThreadLinkView({ link }: { readonly link: NewThreadLink }) {
 
   switch (state.status) {
     case "opening":
-      return <LinkPage title="Opening the link..." />;
+      return <LinkPage title={t("Opening the link...")} />;
     case "opened":
       return (
-        <LinkPage title="This link is open">
+        <LinkPage title={t("This link is open")}>
           <Button
             size="sm"
             variant="outline"
@@ -347,26 +360,26 @@ export function NewThreadLinkView({ link }: { readonly link: NewThreadLink }) {
               setState({ status: "opening" });
             }}
           >
-            Open it again
+            {t("Open it again")}
           </Button>
         </LinkPage>
       );
     case "failed":
       return (
-        <LinkPage title={state.title ?? "Could not open the link"} description={state.message} />
+        <LinkPage title={state.title ?? t("Could not open the link")} description={state.message} />
       );
     case "missing-repository": {
       const name = `${state.repository.owner}/${state.repository.name}`;
       return (
         <LinkPage
-          title={`You don't have ${name}`}
-          description="Clone it to work on it here, or start without a project."
+          title={t("You don't have {repository}", { repository: name })}
+          description={t("Clone it to work on it here, or start without a project.")}
         >
           <Button size="sm" onClick={() => void cloneRepository(state.repository)}>
-            Clone {name}
+            {t("Clone {repository}", { repository: name })}
           </Button>
           <Button size="sm" variant="outline" onClick={openWithoutProject}>
-            Use without project
+            {t("Use without project")}
           </Button>
         </LinkPage>
       );
@@ -404,8 +417,10 @@ function PullRequestLinkCheckout({
   const { owner, name, number } = link.pullRequest;
   return (
     <LinkPage
-      title={`Check out ${owner}/${name}#${number}?`}
-      description="This puts the pull request's code in a new worktree and runs your project's setup script on it."
+      title={t("Check out {owner}/{name}#{number}?", { owner, name, number })}
+      description={t(
+        "This puts the pull request's code in a new worktree and runs your project's setup script on it.",
+      )}
     >
       <Button
         size="sm"
@@ -417,7 +432,7 @@ function PullRequestLinkCheckout({
           )
         }
       >
-        {handoff !== null ? "Checking out..." : "Check out"}
+        {handoff !== null ? t("Checking out...") : t("Check out")}
       </Button>
     </LinkPage>
   );

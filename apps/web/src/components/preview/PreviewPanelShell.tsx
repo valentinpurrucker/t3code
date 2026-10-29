@@ -6,6 +6,7 @@ import {
 import { RESIZABLE_WIDTH_PROPERTY } from "~/hooks/useResizableWidth";
 import { workspaceAreaProps } from "../../lib/workspaceFocus";
 import { cn } from "~/lib/utils";
+import { t } from "~/i18n";
 
 import { RightPanelResizeHandle } from "./RightPanelResizeHandle";
 
@@ -45,7 +46,7 @@ function ResizablePreviewPanelShell(props: PreviewPanelShellProps) {
 function PreviewPanelShellFrame(
   props: PreviewPanelShellProps & { inlineSize: PreviewPanelInlineSize },
 ) {
-  const panelArea = workspaceAreaProps("panel", 4, props.workspaceLabel ?? "Workspace panel");
+  const panelArea = workspaceAreaProps("panel", 4, props.workspaceLabel ?? t("Workspace panel"));
   const isInline = props.mode === "inline";
   const collapsible = isInline && props.open !== undefined;
   const open = props.open ?? true;

@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "@tanstack/react-router";
 import { ChevronRightIcon, LayersIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { t } from "~/i18n";
+
 import { cn } from "../../lib/utils";
 import type { SidebarProjectSnapshot } from "../../sidebarProjectGrouping";
 import { useEnvironments, type EnvironmentPresentation } from "../../state/environments";
@@ -66,7 +68,7 @@ export function SettingsScopeNotice({
           const { primary, secondary } = environment
             ? settingsScopeEnvironmentLabels(environment, environments)
             : {
-                primary: member.environmentLabel ?? "Environment",
+                primary: member.environmentLabel ?? t("Environment"),
                 secondary: member.environmentId,
               };
           return {
@@ -113,7 +115,7 @@ export function SettingsScopeNotice({
               })
           : [
               {
-                label: "Open all environments",
+                label: t("Open all environments"),
                 icon: <LayersIcon aria-hidden className="size-4 shrink-0 text-muted-foreground" />,
                 search: {},
               },

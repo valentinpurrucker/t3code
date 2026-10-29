@@ -1,3 +1,5 @@
+import { t } from "~/i18n";
+
 /** Resolves web references without inheriting the desktop renderer's custom app scheme. */
 export function resolveProtocolRelativeMediaUrl(src: string): string {
   if (!src.startsWith("//")) return src;
@@ -12,14 +14,19 @@ async function readMediaBlob(src: string): Promise<Blob> {
     response = await fetch(src);
   } catch (cause) {
     throw new Error(
-      "The file could not be fetched. The host may block browser access (CORS), or the connection may be unavailable.",
+      t(
+        "The file could not be fetched. The host may block browser access (CORS), or the connection may be unavailable.",
+      ),
       { cause },
     );
   }
-  if (!response.ok) throw new Error(`The file could not be fetched (HTTP ${response.status}).`);
+  if (!response.ok)
+    throw new Error(
+      t("The file could not be fetched (HTTP {status}).", { status: response.status }),
+    );
   const blob = await response.blob();
   if (blob.type.split(";", 1)[0] === "text/html") {
-    throw new Error("This link returned a web page instead of media. Open the original URL.");
+    throw new Error(t("This link returned a web page instead of media. Open the original URL."));
   }
   return blob;
 }
@@ -48,7 +55,7 @@ export async function readMediaPng(src: string): Promise<Blob> {
       await image.decode();
     } catch (cause) {
       throw new Error(
-        "The browser could not decode this image for copying. Try saving it instead.",
+        t("The browser could not decode this image for copying. Try saving it instead."),
         {
           cause,
         },
@@ -57,19 +64,19 @@ export async function readMediaPng(src: string): Promise<Blob> {
     const { naturalWidth: width, naturalHeight: height } = image;
     if (width <= 0 || height <= 0 || width * height > 64_000_000) {
       throw new Error(
-        "This image is too large or has no usable dimensions. Try saving it instead.",
+        t("This image is too large or has no usable dimensions. Try saving it instead."),
       );
     }
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
     const context = canvas.getContext("2d");
-    if (!context) throw new Error("Image copying is unavailable in this browser.");
+    if (!context) throw new Error(t("Image copying is unavailable in this browser."));
     context.drawImage(image, 0, 0);
     return await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob(
         (png) =>
-          png ? resolve(png) : reject(new Error("The image could not be converted to PNG.")),
+          png ? resolve(png) : reject(new Error(t("The image could not be converted to PNG."))),
         "image/png",
       );
     });

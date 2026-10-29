@@ -33,10 +33,11 @@ import { useAtomCommand } from "~/state/use-atom-command";
 import { DeviceLoadingView } from "./DeviceLoadingView";
 import { DeviceSetup, deviceHubReadiness, isAndroidDiscoveryUncertain } from "./DeviceSetup";
 import { DeviceWorkspace } from "./DeviceWorkspace";
+import { t } from "~/i18n";
 import { PreviewPanelShell, type PreviewPanelMode } from "../preview/PreviewPanelShell";
 
 const platformLabel = (platform: DevicePlatform) =>
-  platform === "ios" ? "iOS Simulators" : "Android Emulators";
+  platform === "ios" ? t("iOS Simulators") : t("Android Emulators");
 
 const deviceKey = (device: Pick<DeviceSummary, "hostId" | "id">) =>
   `${device.hostId}\u0000${device.id}`;
@@ -221,8 +222,9 @@ export function DevicePanel(props: {
           <DeviceHostUpdates state={state} environmentId={environmentId} />
           {bootingDevices.length > 0 ? (
             <div role="status" className="border-b px-3 py-2 text-xs text-muted-foreground">
-              Starting {bootingDevices.map((device) => device.name).join(", ")}… This can take a
-              minute.
+              {t("Starting {devices}… This can take a minute.", {
+                devices: bootingDevices.map((device) => device.name).join(", "),
+              })}
             </div>
           ) : null}
           {operationError ? (
@@ -237,7 +239,7 @@ export function DevicePanel(props: {
               key={`${environmentId}\u0000${deviceKey(activeDevice)}`}
               environmentId={environmentId}
               device={activeDevice}
-              hostLabel={activeHost?.label ?? "Device host"}
+              hostLabel={activeHost?.label ?? t("Device host")}
               simlock={activeHost?.kind === "simlock"}
               hostDiagnostics={
                 diagnostics.find(({ hostId }) => hostId === activeDevice.hostId)?.detail
@@ -249,21 +251,21 @@ export function DevicePanel(props: {
             />
           ) : loading ? (
             <DeviceLoadingView
-              name={pendingDevice?.name ?? "Devices"}
+              name={pendingDevice?.name ?? t("Devices")}
               description={
                 pendingDevice
-                  ? `${state.hosts.find((host) => host.id === pendingDevice.hostId)?.label ?? "Device host"} · ${pendingDevice.version}`
+                  ? `${state.hosts.find((host) => host.id === pendingDevice.hostId)?.label ?? t("Device host")} · ${pendingDevice.version}`
                   : ""
               }
               stage="opening"
               message={
                 pendingDevice
                   ? pendingDevice.booted
-                    ? "Opening device…"
-                    : "Starting device…"
+                    ? t("Opening device…")
+                    : t("Starting device…")
                   : state.hostStatus === "installing"
-                    ? (state.hostStatusDetail ?? "Installing device support…")
-                    : "Finding devices…"
+                    ? (state.hostStatusDetail ?? t("Installing device support…"))
+                    : t("Finding devices…")
               }
             />
           ) : (
@@ -282,8 +284,8 @@ export function DevicePanel(props: {
                       tabIndex={state.hostStatus === "failed" ? 0 : undefined}
                     >
                       {state.hostStatus === "failed"
-                        ? (state.hostStatusDetail ?? "The device hub failed to start.")
-                        : "No simulators or emulators were found on this environment."}
+                        ? (state.hostStatusDetail ?? t("The device hub failed to start."))
+                        : t("No simulators or emulators were found on this environment.")}
                     </p>
                   </>
                 ) : null}
@@ -309,14 +311,18 @@ export function DevicePanel(props: {
                                   {device.name}
                                 </span>
                                 <span className="truncate text-xs text-muted-foreground">
-                                  {`${state.hosts.find((host) => host.id === device.hostId)?.label} · ${device.version} · ${device.booted ? "Running" : "Stopped"}`}
+                                  {`${state.hosts.find((host) => host.id === device.hostId)?.label} · ${device.version} · ${device.booted ? t("Running") : t("Stopped")}`}
                                 </span>
                               </div>
                               <Button
                                 variant="outline"
                                 size="sm"
                                 disabled={pendingDeviceKey !== null}
-                                aria-label={`${device.booted ? "Open" : "Start"} ${device.name}`}
+                                aria-label={
+                                  device.booted
+                                    ? t("Open {name}", { name: device.name })
+                                    : t("Start {name}", { name: device.name })
+                                }
                                 onClick={() => void selectDevice(deviceKey(device))}
                               >
                                 {pendingDeviceKey === deviceKey(device) ? (
@@ -326,7 +332,7 @@ export function DevicePanel(props: {
                                 ) : (
                                   <Play />
                                 )}
-                                {device.booted ? "Open" : "Start"}
+                                {device.booted ? t("Open") : t("Start")}
                               </Button>
                             </div>
                           ))}
@@ -340,8 +346,9 @@ export function DevicePanel(props: {
                 !state.devices.some((device) => device.platform === "android") &&
                 !unavailablePlatforms.some((platform) => platform.platform === "android") ? (
                   <p className="max-w-sm text-xs">
-                    No Android virtual devices found. Create one in Android Studio's Device Manager,
-                    then refresh.
+                    {t(
+                      "No Android virtual devices found. Create one in Android Studio's Device Manager, then refresh.",
+                    )}
                   </p>
                 ) : null}
                 {loaded && !hostBusy ? (
@@ -351,7 +358,7 @@ export function DevicePanel(props: {
                     size="sm"
                     onClick={() => void list({ environmentId, input: {} })}
                   >
-                    Refresh devices
+                    {t("Refresh devices")}
                   </Button>
                 ) : null}
               </div>
@@ -388,7 +395,9 @@ function DeviceNotice(props: {
       <Button
         size="icon-xs"
         variant="ghost"
-        aria-label={props.tone === "warning" ? "Dismiss device warning" : "Dismiss device error"}
+        aria-label={
+          props.tone === "warning" ? t("Dismiss device warning") : t("Dismiss device error")
+        }
         onClick={props.onDismiss}
       >
         <X />
@@ -402,7 +411,9 @@ function DeviceDiscoveryWarning(props: { readonly label: string; readonly detail
   if (dismissed) return null;
   return (
     <DeviceNotice tone="warning" onDismiss={() => setDismissed(true)}>
-      <p className="font-medium">Device discovery warning · {props.label}</p>
+      <p className="font-medium">
+        {t("Device discovery warning · {label}", { label: props.label })}
+      </p>
       {props.detail}
     </DeviceNotice>
   );

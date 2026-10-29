@@ -11,6 +11,7 @@ import {
   formatUsd,
 } from "@t3tools/shared/usageFormat";
 import { cn } from "~/lib/utils";
+import { t } from "~/i18n";
 import { PROVIDER_ORDER, PROVIDER_PRESENTATION } from "./usageProviders";
 import { observeResize } from "~/lib/observeResize";
 
@@ -271,7 +272,7 @@ function UsageChartTooltip({
         );
       })}
       <div className="mt-1 flex items-center justify-between gap-3 border-t border-border pt-1">
-        <span className="text-muted-foreground">Total</span>
+        <span className="text-muted-foreground">{t("Total")}</span>
         <span className={cn("tabular-nums", partial ? "text-muted-foreground" : "text-foreground")}>
           {format(column?.total ?? 0)}
         </span>
@@ -441,6 +442,14 @@ export function UsageProviderChart({
     resolution === "hour" && referenceTime !== undefined
       ? formatRelativeHourShort(period, referenceTime, timeZone, hour12)
       : formatPeriod(period);
+  const chartLabel =
+    resolution === "hour"
+      ? metric === "tokens"
+        ? t("Hourly processed tokens by provider")
+        : t("Hourly cost by provider")
+      : metric === "tokens"
+        ? t("Daily processed tokens by provider")
+        : t("Daily cost by provider");
 
   return (
     <div className="flex flex-col gap-1">
@@ -467,7 +476,7 @@ export function UsageProviderChart({
           loadingProviders={loadingProviders}
           format={format}
           formatTooltipPeriod={formatTooltipPeriod}
-          ariaLabel={`${resolution === "hour" ? "Hourly" : "Daily"} ${metric === "tokens" ? "processed tokens" : "cost"} by provider`}
+          ariaLabel={chartLabel}
         >
           {scale.ticks.map((tick) => {
             const y = toY(tick);

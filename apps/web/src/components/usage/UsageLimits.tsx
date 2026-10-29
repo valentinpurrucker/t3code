@@ -21,6 +21,7 @@ import { GaugeIcon, TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 import { Fragment, type ReactNode, useLayoutEffect, useState } from "react";
 
 import { usePrimarySettings } from "../../hooks/useSettings";
+import { t, tn } from "~/i18n";
 import { observeResize } from "../../lib/observeResize";
 import { environmentPresentations } from "../../state/presentation";
 import { useEnvironmentScope, readEnvironmentScope } from "../../state/session";
@@ -42,9 +43,15 @@ import { UsageLimitsPooled } from "./UsageLimitsPooled";
 import { PROVIDER_PRESENTATION } from "./usageProviders";
 
 const PACE: Record<LimitPace, { readonly label: string; readonly icon: typeof GaugeIcon }> = {
-  ahead: { label: "Ahead of pace: spending faster than the window elapses", icon: TrendingUpIcon },
-  on: { label: "On pace with the window", icon: GaugeIcon },
-  under: { label: "Under pace: headroom left for the rest of the window", icon: TrendingDownIcon },
+  ahead: {
+    label: t("Ahead of pace: spending faster than the window elapses"),
+    icon: TrendingUpIcon,
+  },
+  on: { label: t("On pace with the window"), icon: GaugeIcon },
+  under: {
+    label: t("Under pace: headroom left for the rest of the window"),
+    icon: TrendingDownIcon,
+  },
 };
 
 export function barColor(driver: ServerProvider["driver"]): string {
@@ -129,8 +136,14 @@ function WindowBar({
   const resetsAt = window.resetsAt
     ? formatUpcomingTimestamp(window.resetsAt, timestampFormat, now)
     : null;
-  const summary = `${window.label}: ${remaining}% left${
-    timeLeft === null ? "" : `, ${timeLeft}% of the window left`
+  const summary = `${
+    timeLeft === null
+      ? t("{label}: {remaining}% left", { label: window.label, remaining })
+      : t("{label}: {remaining}% left, {timeLeft}% of the window left", {
+          label: window.label,
+          remaining,
+          timeLeft,
+        })
   }${resetsIn ? `, ${resetsIn}` : ""}`;
 
   return (
@@ -167,14 +180,17 @@ function WindowBar({
       <TooltipPopup side="top">
         <div className="flex flex-col gap-0.5">
           <span className="text-foreground">
-            {remaining}% left{timeLeft !== null ? ` · ${timeLeft}% of the window left` : ""}
+            {t("{remaining}% left", { remaining })}
+            {timeLeft !== null ? ` · ${t("{timeLeft}% of the window left", { timeLeft })}` : ""}
           </span>
           {timeLeft !== null ? (
-            <span className="text-muted-foreground">The line is where even spending would be.</span>
+            <span className="text-muted-foreground">
+              {t("The line is where even spending would be.")}
+            </span>
           ) : null}
           {resetsAt ? (
             <span className="text-muted-foreground">
-              Resets {resetsAt}
+              {t("Resets {resetsAt}", { resetsAt })}
               {resetsIn ? ` · ${resetsIn}` : ""}
             </span>
           ) : null}
@@ -212,7 +228,7 @@ export function LimitWindows({
             <span className="flex min-w-0 items-center gap-2 text-xs">
               <span className="truncate text-muted-foreground">{window.label}</span>
               <span className="ms-auto shrink-0 font-medium text-foreground tabular-nums">
-                {remainingPercent(window)}% left
+                {t("{remaining}% left", { remaining: remainingPercent(window) })}
               </span>
             </span>
             <WindowBar color={color} window={window} now={now} />
@@ -228,10 +244,10 @@ export function LimitWindows({
 }
 
 const OUTCOME_TEXT: Record<ProviderConsumeResetCreditOutcome, string> = {
-  reset: "Reset applied. Your windows have cleared.",
-  nothingToReset: "Nothing to reset right now.",
-  noCredit: "No reset credit left.",
-  alreadyRedeemed: "That credit was already redeemed.",
+  reset: t("Reset applied. Your windows have cleared."),
+  nothingToReset: t("Nothing to reset right now."),
+  noCredit: t("No reset credit left."),
+  alreadyRedeemed: t("That credit was already redeemed."),
 };
 
 export function useResetCredit(
@@ -258,7 +274,7 @@ export function useResetCredit(
     setStatus(
       "error" in result.cause && result.cause.error instanceof Error
         ? result.cause.error.message
-        : "Could not use the reset credit.",
+        : t("Could not use the reset credit."),
     );
   };
 
@@ -282,16 +298,17 @@ export function ResetCreditDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogPopup>
         <AlertDialogHeader>
-          <AlertDialogTitle>Use a reset credit?</AlertDialogTitle>
+          <AlertDialogTitle>{t("Use a reset credit?")}</AlertDialogTitle>
           <AlertDialogDescription>
-            This redeems one credit on your account and clears the current rate-limit windows. It
-            cannot be undone.
+            {t(
+              "This redeems one credit on your account and clears the current rate-limit windows. It cannot be undone.",
+            )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+          <AlertDialogClose render={<Button variant="outline" />}>{t("Cancel")}</AlertDialogClose>
           <Button disabled={disabled} onClick={onConfirm}>
-            Use credit
+            {t("Use credit")}
           </Button>
         </AlertDialogFooter>
       </AlertDialogPopup>
@@ -307,12 +324,16 @@ export function resetCreditsSummary(
   const expiresIn = credits.nextExpiresAt
     ? formatDuration(Date.parse(credits.nextExpiresAt) - now)
     : null;
-  if (credits.availableCount === 0) return "No reset credits banked";
+  if (credits.availableCount === 0) return t("No reset credits banked");
   if (compact)
-    return `${credits.availableCount} banked${expiresIn ? ` · expires in ${expiresIn}` : ""}`;
-  return `${credits.availableCount} ${credits.availableCount === 1 ? "reset credit" : "reset credits"} banked${
-    expiresIn ? ` · next expires in ${expiresIn}` : ""
-  }`;
+    return `${t("{count} banked", { count: credits.availableCount })}${
+      expiresIn ? ` · ${t("expires in {duration}", { duration: expiresIn })}` : ""
+    }`;
+  return `${tn(
+    credits.availableCount,
+    "{count} reset credit banked",
+    "{count} reset credits banked",
+  )}${expiresIn ? ` · ${t("next expires in {duration}", { duration: expiresIn })}` : ""}`;
 }
 
 export function ResetCredits({
@@ -343,7 +364,7 @@ export function ResetCredits({
             if (readEnvironmentScope(environmentId, AuthProvidersManageScope)) setConfirming(true);
           }}
         >
-          {busy ? "Using…" : "Use reset"}
+          {busy ? t("Using…") : t("Use reset")}
         </Button>
       ) : null}
       {status ? <span className="text-foreground">{status}</span> : null}

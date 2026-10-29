@@ -8,6 +8,7 @@ import {
   type ProviderInstanceEntry,
 } from "../../providerInstances";
 import { useEnvironmentProviders, useEnvironments } from "../../state/environments";
+import { t } from "~/i18n";
 import { useSettingsScope } from "./SettingsScopeContext";
 
 export function useScopedModelDisabledReason(
@@ -40,7 +41,12 @@ export function useScopedModelDisabledReason(
         entry.driverKind !== sourceEntry?.driverKind ||
         !options?.some((option) => option.slug === model && !option.isUnavailable)
       ) {
-        return `This model is unavailable on ${environment?.label ?? "a selected environment"}. Select that environment to choose its model separately.`;
+        return t(
+          "This model is unavailable on {environment}. Select that environment to choose its model separately.",
+          {
+            environment: environment?.label ?? t("a selected environment"),
+          },
+        );
       }
     }
     return null;

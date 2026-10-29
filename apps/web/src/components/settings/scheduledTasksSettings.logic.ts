@@ -25,6 +25,7 @@ import {
 } from "@t3tools/shared/projectSettings";
 import type { ProviderInstanceEntry } from "../../providerInstances";
 
+import { t } from "~/i18n";
 import type { ResolvedSettingsScope } from "./settingsScope";
 
 export function matchesScheduledTaskScope(
@@ -101,26 +102,28 @@ export function webhookDraftErrors(draft: DraftState) {
   if (parseMaxDeliveryAge(draft.maxDeliveryAgeMinutes) === undefined)
     return [
       {
-        title: "Invalid age limit",
-        description: `Enter whole minutes from 1 to ${MAX_WEBHOOK_DELIVERY_AGE_MINUTES}, or leave it blank.`,
+        title: t("Invalid age limit"),
+        description: t("Enter whole minutes from 1 to {max}, or leave it blank.", {
+          max: MAX_WEBHOOK_DELIVERY_AGE_MINUTES,
+        }),
       },
     ];
   const errors: Array<{ title: string; description: string }> = [];
   for (const [label, value] of [
-    ["Replay key", draft.replayKey],
-    ["Coalesce key", draft.coalesceKey],
+    [t("Replay key"), draft.replayKey],
+    [t("Coalesce key"), draft.coalesceKey],
   ] as const) {
     if (value.trim() && !isWebhookDedupeTemplate(value.trim()))
       errors.push({
-        title: "Invalid webhook settings",
-        description: `${label} must contain a valid request placeholder.`,
+        title: t("Invalid webhook settings"),
+        description: t("{field} must contain a valid request placeholder.", { field: label }),
       });
   }
   const window = draft.coalesceWindowSeconds.trim();
   if (window && (!Number.isInteger(Number(window)) || Number(window) < 10 || Number(window) > 3600))
     errors.push({
-      title: "Invalid webhook settings",
-      description: "Coalesce window must be whole seconds from 10 to 3600.",
+      title: t("Invalid webhook settings"),
+      description: t("Coalesce window must be whole seconds from 10 to 3600."),
     });
   return errors;
 }
@@ -129,16 +132,17 @@ export function webhookDeliveryLabel(delivery: {
   readonly outcome: string;
   readonly pendingWindow?: boolean | undefined;
 }) {
-  if (delivery.outcome === "accepted") return delivery.pendingWindow ? "Opened window" : "Ran";
+  if (delivery.outcome === "accepted")
+    return delivery.pendingWindow ? t("Opened window") : t("Ran");
   const labels: Record<string, string> = {
-    dispatch_failed: "Run failed",
-    duplicate: "Duplicate",
-    coalesced: "Coalesced",
-    filtered: "Filtered",
-    rejected_signature: "Bad signature",
-    disabled: "Task paused",
-    rate_limited: "Rate limited",
-    expired: "Too old",
+    dispatch_failed: t("Run failed"),
+    duplicate: t("Duplicate"),
+    coalesced: t("Coalesced"),
+    filtered: t("Filtered"),
+    rejected_signature: t("Bad signature"),
+    disabled: t("Task paused"),
+    rate_limited: t("Rate limited"),
+    expired: t("Too old"),
   };
   return labels[delivery.outcome] ?? delivery.outcome.replaceAll("_", " ");
 }

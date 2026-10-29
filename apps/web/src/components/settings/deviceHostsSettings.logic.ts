@@ -1,5 +1,7 @@
 import type { EnvironmentId, SshDeviceHostConfig } from "@t3tools/contracts";
 
+import { t } from "~/i18n";
+
 export interface DeviceHostEnvironment {
   readonly environmentId: EnvironmentId;
   readonly label: string;
@@ -66,7 +68,7 @@ export function updateDeviceHosts(
     const matches = hosts.filter((candidate) => sameDestination(candidate, destination));
     if (matches.length > 1) {
       throw new Error(
-        "Multiple hosts match this SSH destination. Select the environment to edit its hosts.",
+        t("Multiple hosts match this SSH destination. Select the environment to edit its hosts."),
       );
     }
     return matches[0];
