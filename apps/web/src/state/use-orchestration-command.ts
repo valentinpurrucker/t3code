@@ -13,8 +13,11 @@ import { AsyncResult } from "effect/reactivity";
 
 import { readEnvironmentScope } from "./session";
 import { useAtomCommand } from "./use-atom-command";
+import { t } from "~/i18n";
 
-const ORCHESTRATION_OPERATE_DENIED_MESSAGE = "This connection cannot change threads or projects.";
+const ORCHESTRATION_OPERATE_DENIED_MESSAGE = t(
+  "This connection cannot change threads or projects.",
+);
 
 export function useOrchestrationCommand<W extends { readonly environmentId: EnvironmentId }, A, E>(
   command: AtomCommand<W, A, E>,

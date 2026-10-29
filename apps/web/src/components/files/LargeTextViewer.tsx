@@ -2,6 +2,7 @@ import { useEffect, useImperativeHandle, useRef, useState, type RefObject } from
 import { parseDelimitedPreview } from "@t3tools/shared/delimitedPreview";
 import { formatAttachmentSize } from "@t3tools/client-runtime/state/attachments";
 import { useClientSettings } from "~/hooks/useSettings";
+import { t } from "~/i18n";
 import { FileSurfaceFailure, FileSurfaceLoading, FileSurfaceNotice } from "./fileSurfaceChrome";
 import { PREVIEW_PAGE_ROWS, type TextPreviewResult } from "./largeTextProtocol";
 import VirtualTablePreview from "./VirtualTablePreview";
@@ -126,9 +127,9 @@ export default function LargeTextViewer(props: {
         }
       });
       engine.addEventListener("error", () => {
-        copyPending.current?.reject(new Error("The text viewer stopped."));
+        copyPending.current?.reject(new Error(t("The text viewer stopped.")));
         copyPending.current = null;
-        setError("Could not load the text viewer. Close the file and try again.");
+        setError(t("Could not load the text viewer. Close the file and try again."));
       });
       engine.postMessage(
         {
@@ -180,7 +181,7 @@ export default function LargeTextViewer(props: {
     } else startWorker();
     return () => {
       controller.abort();
-      copyPending.current?.reject(new Error("Preview closed."));
+      copyPending.current?.reject(new Error(t("Preview closed.")));
       copyPending.current = null;
       worker.current?.terminate();
       worker.current = null;
@@ -192,11 +193,11 @@ export default function LargeTextViewer(props: {
     () => () =>
       new Promise<string>((resolve, reject) => {
         if (!worker.current) {
-          reject(new Error("The file is unavailable."));
+          reject(new Error(t("The file is unavailable.")));
           return;
         }
         if (copyPending.current) {
-          reject(new Error("Another copy is in progress."));
+          reject(new Error(t("Another copy is in progress.")));
           return;
         }
         copyPending.current = { resolve, reject };
@@ -217,20 +218,22 @@ export default function LargeTextViewer(props: {
         role="status"
       >
         {Math.max(0, meta.count - (props.delimiter && meta.count ? 1 : 0)).toLocaleString()}{" "}
-        {props.delimiter ? "rows" : "lines"}
-        {props.delimiter ? ` · ${meta.count ? meta.columns.toLocaleString() : 0} columns` : ""}
+        {props.delimiter ? t("rows") : t("lines")}
+        {props.delimiter
+          ? t(" · {count} columns", { count: meta.count ? meta.columns.toLocaleString() : 0 })
+          : ""}
         {meta.complete && meta.sizeBytes !== undefined
-          ? ` · ${meta.sizeBytes === 0 ? "0 bytes" : formatAttachmentSize(meta.sizeBytes)}`
-          : " · Indexing…"}
+          ? ` · ${meta.sizeBytes === 0 ? t("0 bytes") : formatAttachmentSize(meta.sizeBytes)}`
+          : t(" · Indexing…")}
       </div>
       {!meta.complete ? (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20">
-          <FileSurfaceNotice>Loading the rest of the file…</FileSurfaceNotice>
+          <FileSurfaceNotice>{t("Loading the rest of the file…")}</FileSurfaceNotice>
         </div>
       ) : null}
       {meta.columns === 1024 ? (
         <FileSurfaceNotice>
-          Showing the first 1,024 columns. Source and Save retain every column.
+          {t("Showing the first 1,024 columns. Source and Save retain every column.")}
         </FileSurfaceNotice>
       ) : null}
       {meta.count > 0 ? (
@@ -252,7 +255,7 @@ export default function LargeTextViewer(props: {
         />
       ) : (
         <div className="flex flex-1 items-center justify-center p-6 text-xs text-muted-foreground">
-          This file is empty.
+          {t("This file is empty.")}
         </div>
       )}
     </div>

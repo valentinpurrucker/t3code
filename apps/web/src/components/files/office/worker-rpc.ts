@@ -2,6 +2,7 @@
 // The engines run in a worker per open file, so no layout, recalculation or painting holds the window. These are the
 // two ends of that worker's protocol: typed calls by method name, a key that lets a newer call replace a queued one
 // (as the markdown worker's queue does), transferable payloads, and a worker that fails every pending call when it dies.
+import { t } from "~/i18n";
 
 /** What one method takes and returns. */
 export type Method<Input, Output> = { readonly input: Input; readonly output: Output };
@@ -117,7 +118,7 @@ export function createWorkerClient<M extends Methods>(worker: Worker) {
           () =>
             fail(
               new WorkerClosedError(
-                "This document took too long to preview. Open it in another app.",
+                t("This document took too long to preview. Open it in another app."),
               ),
             ),
           30_000,

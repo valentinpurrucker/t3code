@@ -2,6 +2,7 @@ import type { DesktopBridge, DesktopWslState } from "@t3tools/contracts";
 import * as Effect from "effect/Effect";
 import * as Schema from "effect/Schema";
 import { Atom } from "effect/reactivity";
+import { t } from "~/i18n";
 
 import { appAtomRegistry } from "~/rpc/atomRegistry";
 
@@ -14,7 +15,7 @@ class DesktopWslStateUnavailableError extends Schema.TaggedError<DesktopWslState
   {},
 ) {
   override get message(): string {
-    return "Desktop WSL state is unavailable.";
+    return t("Desktop WSL state is unavailable.");
   }
 }
 
@@ -23,7 +24,7 @@ class DesktopWslStateLoadError extends Schema.TaggedError<DesktopWslStateLoadErr
   { cause: Schema.Defect() },
 ) {
   override get message(): string {
-    return "Failed to load WSL state.";
+    return t("Failed to load WSL state.");
   }
 }
 

@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { t } from "~/i18n";
+
 import {
   AlertDialog,
   AlertDialogClose,
@@ -36,9 +38,11 @@ export function RemoveT3ConnectEnvironmentDialog({
       >
         <AlertDialogPopup>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove {shownLabel} from this device?</AlertDialogTitle>
+            <AlertDialogTitle>
+              {t("Remove {name} from this device?", { name: shownLabel })}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              This forgets its pairing, credentials, and cached threads here.
+              {t("This forgets its pairing, credentials, and cached threads here.")}
             </AlertDialogDescription>
             <AlertDialogDescription>
               It stays on your T3 Connect account and keeps its host space. Deregister it in{" "}
@@ -49,18 +53,18 @@ export function RemoveT3ConnectEnvironmentDialog({
                     openAccountPage();
                   }}
                 >
-                  T3 Connect settings
+                  {t("T3 Connect settings")}
                 </InlineButton>
               ) : (
-                "T3 Connect settings"
+                t("T3 Connect settings")
               )}{" "}
               to free it.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+            <AlertDialogClose render={<Button variant="outline" />}>{t("Cancel")}</AlertDialogClose>
             <Button variant="destructive" onClick={onConfirm}>
-              Remove from this device
+              {t("Remove from this device")}
             </Button>
           </AlertDialogFooter>
         </AlertDialogPopup>

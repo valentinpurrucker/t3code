@@ -14,6 +14,7 @@ import { selectActiveRightPanel, useRightPanelStore } from "../rightPanelStore";
 import { type CommandHandler, type CommandScopeOptions, registerCommands } from "./dispatcher";
 import { selectThreadTerminalUiState, useTerminalUiStateStore } from "../terminalUiStateStore";
 import { resolveThreadRouteTarget } from "../threadRoutes";
+import { t } from "~/i18n";
 
 function consume(event: KeyboardEvent): void {
   event.preventDefault();
@@ -73,7 +74,9 @@ export function installCommandPaletteCommands(
         }
         toastManager.add({
           id: "appearance-cycle",
-          title: `Appearance: ${APPEARANCE_OPTIONS.find((option) => option.mode === nextMode)?.label}`,
+          title: t("Appearance: {label}", {
+            label: APPEARANCE_OPTIONS.find((option) => option.mode === nextMode)?.label,
+          }),
           timeout: 1500,
         });
       },

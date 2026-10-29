@@ -1,0 +1,23 @@
+{
+  "Copied!": "Kopiert!",
+  "Failed to copy": "Kopieren fehlgeschlagen",
+  "{label} saturation and brightness": "{label}: Sättigung und Helligkeit",
+  "Use arrow keys to adjust the focused value. Hold Shift for larger steps. Use Home and End for the minimum and maximum. Press Tab to move between saturation and brightness.": "Pfeiltasten passen den fokussierten Wert an. Halte die Umschalttaste für größere Schritte gedrückt. Mit Home und End springst du zum Minimum und Maximum. Mit Tab wechselst du zwischen Sättigung und Helligkeit.",
+  "Saturation": "Sättigung",
+  "Brightness": "Helligkeit",
+  "{label} {axis}": "{label}: {axis}",
+  "Close": "Schließen",
+  "Loading": "Wird geladen",
+  "Sidebar": "Seitenleiste",
+  "Displays the mobile sidebar.": "Zeigt die mobile Seitenleiste an.",
+  "Toggle Sidebar": "Seitenleiste umschalten",
+  "Resize Sidebar": "Seitenleiste anpassen",
+  "Drag to resize sidebar": "Zum Anpassen der Seitenleiste ziehen",
+  "Copied error": "Fehler kopiert",
+  "Copy error": "Fehler kopieren",
+  "Show details": "Details anzeigen",
+  "Hide details": "Details ausblenden",
+  "Dismiss notification": "Benachrichtigung schließen",
+  "Setup progress": "Einrichtungsfortschritt",
+  "{step}, step {index}{summary}": "{step}, Schritt {index}{summary}"
+}

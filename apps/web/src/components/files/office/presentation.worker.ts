@@ -21,6 +21,7 @@ import {
 import { deckText } from "./slide-text";
 import { officeImageBitmap } from "./image-bitmap";
 import { serveWorker, Transfer } from "./worker-rpc";
+import { t } from "~/i18n";
 
 // One worker holds one open PowerPoint deck: its engine, fonts, laid-out slides, decoded pictures and painting. The
 // window terminates the worker when the deck closes, which is the only way the engine's memory is given back.
@@ -71,7 +72,7 @@ const state: WorkerState = { deck: undefined };
 
 serveWorker<SlideMethods>({
   open: async (input) => {
-    if (state.deck) throw new Error("The worker already holds a deck");
+    if (state.deck) throw new Error(t("The worker already holds a deck"));
 
     await initWasm();
 
@@ -106,14 +107,14 @@ serveWorker<SlideMethods>({
 });
 
 function required() {
-  if (!state.deck) throw new Error("The worker holds no deck");
+  if (!state.deck) throw new Error(t("The worker holds no deck"));
 
   return state.deck;
 }
 
 /** The worker's own font set, which its canvases draw text with. */
 function workerFonts() {
-  if (!("fonts" in self)) throw new Error("This browser has no fonts in workers");
+  if (!("fonts" in self)) throw new Error(t("This browser has no fonts in workers"));
 
   // SAFETY: a worker's global scope is a FontFaceSource, whose `fonts` is a FontFaceSet (CSS Font Loading, exposed to
   // workers). The window's types declare it on documents only, and workers expose no FontFaceSet to check against.

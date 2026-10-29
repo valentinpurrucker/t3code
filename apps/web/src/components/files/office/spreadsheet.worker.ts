@@ -14,6 +14,7 @@ import { drawFrame, paintFrame } from "./sheet-frame";
 import { frozenSize } from "./sheet-paint";
 import type { SheetLayout, SheetMethods, SheetTab } from "./sheet-protocol";
 import { serveWorker, Transfer } from "./worker-rpc";
+import { t } from "~/i18n";
 
 // One worker holds one open workbook: its engine, recalculation, display lists and the painting of its cells. The
 // window terminates the worker when the workbook closes, which is the only way the engine's memory is given back.
@@ -35,7 +36,7 @@ const state: State = { opened: undefined };
 
 serveWorker<SheetMethods>({
   open: async (input) => {
-    if (state.opened) throw new Error("The worker already holds a workbook");
+    if (state.opened) throw new Error(t("The worker already holds a workbook"));
 
     await initWasm();
 
@@ -143,7 +144,7 @@ serveWorker<SheetMethods>({
 });
 
 function required() {
-  if (!state.opened) throw new Error("The worker holds no workbook");
+  if (!state.opened) throw new Error(t("The worker holds no workbook"));
 
   return state.opened;
 }

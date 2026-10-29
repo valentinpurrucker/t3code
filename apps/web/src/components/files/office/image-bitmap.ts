@@ -3,6 +3,8 @@ import {
   readImageDimensions,
 } from "@t3tools/shared/imageDimensions";
 
+import { t } from "~/i18n";
+
 export async function officeImageBitmap(blob: Blob) {
   const bytes = new Uint8Array(await blob.slice(0, IMAGE_DIMENSIONS_HEADER_BYTES).arrayBuffer());
   let size = readImageDimensions(bytes);
@@ -15,6 +17,6 @@ export async function officeImageBitmap(blob: Blob) {
   }
   // Unknown dimensions cannot be decoded safely: compressed bytes do not bound pixel memory.
   if (!size || size.width <= 0 || size.height <= 0 || size.width > 16_777_216 / size.height)
-    throw new Error("This embedded image exceeds the preview pixel limit.");
+    throw new Error(t("This embedded image exceeds the preview pixel limit."));
   return createImageBitmap(blob);
 }

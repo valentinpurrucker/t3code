@@ -22,6 +22,7 @@ import { AsyncResult, Atom } from "effect/reactivity";
 import { formatEnvironmentQueryError, useEnvironmentQuery } from "./query";
 import { terminalEnvironment } from "./terminal";
 import { environmentSession, sessionHasScope, useEnvironmentScope } from "./session";
+import { t } from "~/i18n";
 
 const EMPTY_KNOWN_TERMINAL_SESSIONS = Object.freeze<ReadonlyArray<KnownTerminalSession>>([]);
 
@@ -139,7 +140,7 @@ const attachedTerminalSessionFamily = Atom.family((key: string) => {
   if (Option.isNone(decoded)) {
     return Atom.make<TerminalSessionState>({
       ...EMPTY_TERMINAL_SESSION_STATE,
-      error: "Invalid terminal launch input",
+      error: t("Invalid terminal launch input"),
       status: "error",
     }).pipe(Atom.withLabel(`web-terminal-session:${key}`));
   }

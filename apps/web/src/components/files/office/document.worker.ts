@@ -25,6 +25,7 @@ import { createBitmapImageResolver } from "./word-images";
 import { layerFont, type WordMethods, type WordPageSize, type WordSpan } from "./word-protocol";
 import { pageText, positionTarget, type TextMeasure } from "./word-text";
 import { serveWorker, Transfer } from "./worker-rpc";
+import { t } from "~/i18n";
 
 // One worker holds one open Word document: its engine session, fonts, layout, built pages and painting. The window
 // terminates the worker when the document closes, which is the only way the engine's memory is given back.
@@ -73,7 +74,7 @@ const opened: Lazy<Opened> = { value: undefined };
 
 serveWorker<WordMethods>({
   open: async (input) => {
-    if (opened.value) throw new Error("The worker already holds a document");
+    if (opened.value) throw new Error(t("The worker already holds a document"));
 
     const loaded = await open(new Uint8Array(input.bytes));
 
@@ -97,7 +98,7 @@ serveWorker<WordMethods>({
 });
 
 function required() {
-  if (!opened.value) throw new Error("The worker holds no document");
+  if (!opened.value) throw new Error(t("The worker holds no document"));
 
   return opened.value;
 }
@@ -141,7 +142,7 @@ async function open(bytes: Uint8Array) {
 
   const measurement = measure.measurementConfigForRequirements(requirements);
 
-  if (!measurement) throw new Error("The document's fonts could not be prepared");
+  if (!measurement) throw new Error(t("The document's fonts could not be prepared"));
 
   const input = JSON.stringify({ ...request, measurement });
 
@@ -182,7 +183,7 @@ async function open(bytes: Uint8Array) {
   const retained = { frame: display(null, prefix) };
 
   if (retained.frame.displayList.pages.length === 0)
-    throw new Error("The document produced no pages");
+    throw new Error(t("The document produced no pages"));
 
   // The region layout that finishes the document: begun on the first step, `cost` the running average milliseconds a
   // body block takes.

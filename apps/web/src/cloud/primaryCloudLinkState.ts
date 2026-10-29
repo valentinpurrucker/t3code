@@ -11,6 +11,8 @@ import * as Layer from "effect/Layer";
 import { AsyncResult, Atom } from "effect/reactivity";
 import { HttpClient } from "effect/http";
 
+import { t } from "~/i18n";
+
 import { usePrimaryEnvironment } from "../state/environments";
 import { runtime } from "../lib/runtime";
 import { appAtomRegistry } from "../rpc/atomRegistry";
@@ -85,7 +87,7 @@ export function usePrimaryCloudLinkState() {
   let error: string | null = null;
   if (result._tag === "Failure") {
     const cause = Cause.squash(result.cause);
-    error = cause instanceof Error ? cause.message : "Could not read T3 Connect link state.";
+    error = cause instanceof Error ? cause.message : t("Could not read T3 Connect link state.");
   }
 
   return {
